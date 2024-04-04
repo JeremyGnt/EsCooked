@@ -3,7 +3,8 @@ project(EScooked C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(EScooked main.c)
+add_executable(EScooked main.c
+        menu.h)
 
 IF(WIN32)
     target_link_libraries(EScooked -lmingw32 -lallegro-5.0.10-monolith-md-debug)
