@@ -313,6 +313,7 @@ int main() {
     // Libérations
     al_destroy_display(fenetre);
     al_destroy_event_queue(queue);
+    al_destroy_timer(timer);
     //al_destroy_font(ape);
     destroy(mrbeast);
     destroy(icone);
