@@ -94,33 +94,33 @@ int main() {
     confirm = al_load_bitmap("..\\PNGS\\temp\\confirmation.png");
     assert(confirm != NULL);
 
-    //chaine de lettres pour l'alphabet --> on pourra ajouter les majuscules plus tard
+
+    //init
     const char* charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
 
     /**********************
      *  CREATION DU MENU  *
      **********************/
 
-    enum{ EXIT, NEWGAME, CHARGEGAME, OPTIONS}; //nature de la structure a supprimer plus tard si pas d'utilité
-    enum{ MENU, JEU}; //lieu
-    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT}; //menu dans lequel on se trouve
+    enum{ EXIT, NEWGAME, CHARGEGAME, OPTIONS};
+    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU};
 
-    float abs = WIDTH / 62.4; //pour mes calculs --> a changer plus tard
+    float abs = WIDTH / 62.4;
     float ord = HEIGHT / 35.1;
 
-    sub Menu[4]; //tableau du menu
+    sub Menu[4];
 
-    sub game = createSub(abs * 9, ord * 10, CHARGEGAME); //on cree un menu en renseignant les coordonées
-    sub newgame = createSub(abs * 9, ord * 16, NEWGAME); //ou la fleche est censée etre quand on l'affiche
-    sub options = createSub(abs * 9, ord * 22, OPTIONS); //on changera peut etre le système du menu plus tard
+    sub game = createSub(abs * 9, ord * 10, CHARGEGAME);
+    sub newgame = createSub(abs * 9, ord * 16, NEWGAME);
+    sub options = createSub(abs * 9, ord * 22, OPTIONS);
     sub exit = createSub(abs * 9, ord * 28, EXIT);
 
-    Menu[0] = game; //on donne la position de chaque menu
+    Menu[0] = game;
     Menu[1] = newgame;
     Menu[2] = options;
     Menu[3] = exit;
 
-    int pos = 0, state = MENUPRINCIPAL, lieu = MENU;
+    int pos = 0, state = MENUPRINCIPAL;
 
     //TEXTE
     //char* texte = NULL;
@@ -144,108 +144,101 @@ int main() {
             }
 
             case ALLEGRO_EVENT_KEY_CHAR: {
-                switch (lieu){ //on regarde dans quelle fenetre on doit etre (jeu ou menu)
-                    case MENU:{
-                        switch(state){ //on regarde dans quel menu on est
-                            case MENUPRINCIPAL:{
-                                switch(event.keyboard.keycode){
-                                    case ALLEGRO_KEY_DOWN:{
-                                        afficherImage(menu, 0, 0, 1);
-                                        if(pos!=3){
-                                            afficherImage(fleche, Menu[pos+1].posX, Menu[pos+1].posY, 0);
-                                            pos = pos+1;
-                                        }
-                                        else{
-                                            afficherImage(fleche, Menu[0].posX, Menu[0].posY, 0);
-                                            pos = 0;
-                                        }
-                                        break;
-                                    }
-                                    case ALLEGRO_KEY_UP:{
-                                        afficherImage(menu, 0, 0, 1);
-                                        if(pos!=0){
-                                            afficherImage(fleche, Menu[pos-1].posX, Menu[pos-1].posY, 0);
-                                            pos = pos-1;
-                                        }
-                                        else{
-                                            afficherImage(fleche, Menu[3].posX, Menu[3].posY, 0);
-                                            pos = 3;
-                                        }
-                                        break;
-                                    }
-                                    case ALLEGRO_KEY_ENTER:{
-                                        switch(pos){
-                                            case 0:{
-                                                afficherImage(pseudo, 0, 0, 1);
-                                                state = NEW;
-                                                break;
-                                            }
-                                            case 1:{
-                                                afficherImage(mrbeast, 0, 0, 1);
-                                                state = CHARGE;
-                                                break;
-                                            }
-                                            case 2:{
-                                                afficherImage(mrbeast, 0, 0, 1);
-                                                state = OPT;
-                                                break;
-                                            }
-                                            case 3:{
-                                                afficherImage(confirm, 0, 0, 1);
-                                                state = QUIT;
-                                                break;
-                                            }
-                                        }
-                                    }
+                switch(state){
+                    case MENUPRINCIPAL:{
+                        switch(event.keyboard.keycode){
+                            case ALLEGRO_KEY_DOWN :{
+                                afficherImage(menu, 0, 0, 1);
+                                if(pos!=3){
+                                    afficherImage(fleche, Menu[pos+1].posX, Menu[pos+1].posY, 0);
+                                    pos = pos+1;
                                 }
+                                else{
+                                    afficherImage(fleche, Menu[0].posX, Menu[0].posY, 0);
+                                    pos = 0;
+                                }
+                                break;
                             }
-                            case NEW:{
-                                switch (event.keyboard.keycode) {
-                                    case ALLEGRO_KEY_ESCAPE:{
-                                        state = MENUPRINCIPAL;
-                                        afficherImage(menu, 0, 0, 1);
-                                        afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                            case ALLEGRO_KEY_UP :{
+                                afficherImage(menu, 0, 0, 1);
+                                if(pos!=0){
+                                    afficherImage(fleche, Menu[pos-1].posX, Menu[pos-1].posY, 0);
+                                    pos = pos-1;
+                                }
+                                else{
+                                    afficherImage(fleche, Menu[3].posX, Menu[3].posY, 0);
+                                    pos = 3;
+                                }
+                                break;
+                            }
+                            case ALLEGRO_KEY_ENTER:{
+                                switch(pos){
+                                    case 0:{
+                                        afficherImage(pseudo, 0, 0, 1);
+                                        state = NEW;
                                         break;
                                     }
-                                }
-                            }
-                            case CHARGE:{
-                                switch (event.keyboard.keycode) {
-                                    case ALLEGRO_KEY_ESCAPE:{
-                                        state = MENUPRINCIPAL;
-                                        afficherImage(menu, 0, 0, 1);
-                                        afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                    case 1:{
+                                        afficherImage(mrbeast, 0, 0, 1);
+                                        state = CHARGE;
                                         break;
                                     }
-                                }
-                            }
-                            case OPT:{
-                                switch (event.keyboard.keycode) {
-                                    case ALLEGRO_KEY_ESCAPE:{
-                                        state = MENUPRINCIPAL;
-                                        afficherImage(menu, 0, 0, 1);
-                                        afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                    case 2:{
+                                        afficherImage(mrbeast, 0, 0, 1);
+                                        state = OPT;
                                         break;
                                     }
-                                }
-                            }
-                            case QUIT:{
-                                switch (event.keyboard.keycode) {
-                                    case ALLEGRO_KEY_Y:{
-                                        fini = true;
-                                    }
-                                    case ALLEGRO_KEY_N:{
-                                        state = MENUPRINCIPAL;
-                                        afficherImage(menu, 0, 0, 1);
-                                        afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                    case 3:{
+                                        afficherImage(confirm, 0, 0, 1);
+                                        state = QUIT;
                                         break;
                                     }
                                 }
                             }
                         }
                     }
-                    case JEU:{
-                        afficherImage(mrbeast, 0, 0, 1);
+                    case NEW:{
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_ESCAPE:{
+                                state = MENUPRINCIPAL;
+                                afficherImage(menu, 0, 0, 1);
+                                afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                break;
+                            }
+                        }
+                    }
+                    case CHARGE:{
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_ESCAPE:{
+                                state = MENUPRINCIPAL;
+                                afficherImage(menu, 0, 0, 1);
+                                afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                break;
+                            }
+                        }
+                    }
+                    case OPT:{
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_ESCAPE:{
+                                state = MENUPRINCIPAL;
+                                afficherImage(menu, 0, 0, 1);
+                                afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                break;
+                            }
+                        }
+                    }
+                    case QUIT:{
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_Y:{
+                                fini = true;
+                            }
+                            case ALLEGRO_KEY_N:{
+                                state = MENUPRINCIPAL;
+                                afficherImage(menu, 0, 0, 1);
+                                afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                                break;
+                            }
+                        }
                     }
                 }
             }
