@@ -31,6 +31,8 @@ void libererImages(ImagesCuisine *pMap) {
     al_destroy_bitmap(pMap->decoupe);
     al_destroy_bitmap(pMap->frigo);
     al_destroy_bitmap(pMap->verre);
+    al_destroy_bitmap(pMap->poubelle);
+    al_destroy_bitmap(pMap->presseAgrume);
 }
 
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *mapCuisine) {
