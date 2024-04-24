@@ -14,36 +14,283 @@
 #include "menu.h"
 #include "fichierTexteMap.h"
 
-int main() {
+void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
+    if(R){
+        al_clear_to_color(NOIR);
+    }
+    al_draw_bitmap(buh, x, y, 0);
+}
 
-    ALLEGRO_DISPLAY *display = NULL;
+void display(){
+    al_flip_display();
+}
+
+void destroy(ALLEGRO_BITMAP* buh){
+    al_destroy_bitmap(buh);
+}
+
+int main() {
+    // Initialisations / Installations
+    srand(time(NULL));
+    assert(al_init());
+    assert(al_install_keyboard());
+    assert(al_init_primitives_addon());
+    assert(al_init_image_addon());
+    assert(display);
+    al_init_font_addon();
+    al_init_ttf_addon();
+
+    // Déclarations
+    enum {BAS, HAUT, GAUCHE, DROITE, FBAS, FHAUT, FGAUCHE, FDROITE, ESPACE, NB_TOUCHES_GEREES};
+    enum {ASSIETTE, TOMATE, STEAK, PAIN, BEACON, OIGNON};
+
+    bool fini = false;
+    int toucheEnfoncer[NB_TOUCHES_GEREES] = {0};
+
+    ALLEGRO_DISPLAY* fenetre = NULL;
+    ALLEGRO_EVENT_QUEUE* queue = NULL;
+    ALLEGRO_TIMER* timer = NULL;
+    ALLEGRO_EVENT event;
+
+    //BITMAPS
+    ALLEGRO_BITMAP* mrbeast = NULL;
+    ALLEGRO_BITMAP* transparent = NULL;
+    ALLEGRO_BITMAP* menu = NULL;
+    ALLEGRO_BITMAP* fleche = NULL;
+    ALLEGRO_BITMAP* R = NULL;
+    ALLEGRO_BITMAP* pseudo = NULL;
+    ALLEGRO_BITMAP* confirm = NULL;
+    ALLEGRO_BITMAP *Personnage1 = NULL;
+    ALLEGRO_BITMAP *Personnage2 = NULL;
+    ALLEGRO_BITMAP *Assiette = NULL;
+    ALLEGRO_BITMAP* fond = NULL;
+
+    //icone
+    ALLEGRO_BITMAP* icone = NULL;
+    icone = al_load_bitmap("..\\PNGS\\temp\\icone.png");
+    assert(icone != NULL);
+
+    // Création des éléments
+    Joueur joueur1;
+    Joueur joueur2;
+    Element assiette;
     fichierTexteMap mapCuisine = {0};
     ImagesCuisine imagescuisine;
 
-    assert(al_init());
-    assert(al_init_image_addon());
-    display = al_create_display(WIDTH, HEIGHT);
-    assert(display);
-    al_set_window_position(display, 0, 0);
+    joueur1.longueur = 60;
+    joueur1.hauteur = 60;
+    joueur1.x = WIDTH / 3;
+    joueur1.y = HEIGHT / 2;
+    joueur1.vitesse = 2;
+
+    joueur2.longueur = 60;
+    joueur2.hauteur = 60;
+    joueur2.x = 0;
+    joueur2.y = 0;
+    joueur2.vitesse = 3;
+
+    assiette.longueur = 40;
+    assiette.hauteur = 40;
+    assiette.x = WIDTH / 2;
+    assiette.y = HEIGHT / 3;
+
+    fenetre = al_create_display(WIDTH, HEIGHT);
+    assert(fenetre != NULL);
+    al_set_window_position(fenetre, 0, 0);
+    al_set_window_title(fenetre, "word.exe");
+    al_set_display_icon(fenetre, icone);
+    timer = al_create_timer(1.0/200.0);
+    queue = al_create_event_queue();
     al_clear_to_color(BLANCO);
 
-    ALLEGRO_BITMAP* fond = NULL;
-    fond = al_load_bitmap("../images/fond.jpg");
-    int window_width = al_get_display_width(display);
-    int window_height = al_get_display_height(display);
+    al_register_event_source(queue, al_get_display_event_source(fenetre));
+    al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_timer_event_source(timer));
+
+    al_set_window_position(fenetre, 0, 0);
+    al_set_new_display_flags(ALLEGRO_FULLSCREEN | ALLEGRO_RESIZABLE);
+
+    //Images
+    mrbeast = al_load_bitmap("..\\PNGS\\temp\\maxresdefault.jpg");
+    assert(mrbeast != NULL);
+    transparent = al_load_bitmap("..\\PNGS\\temp\\default.png");
+    assert(transparent != NULL);
+    menu = al_load_bitmap("..\\PNGS\\temp\\menu.png");
+    assert(menu != NULL);
+    fleche = al_load_bitmap("..\\PNGS\\temp\\fleche.png");
+    assert(fleche != NULL);
+    R = al_load_bitmap("..\\PNGS\\temp\\hardR.png");
+    assert(R != NULL);
+    pseudo = al_load_bitmap("..\\PNGS\\temp\\pseudomenu.png");
+    assert(pseudo!=NULL);
+    confirm = al_load_bitmap("..\\PNGS\\temp\\confirmation.png");
+    assert(confirm != NULL);
+    Personnage1 = al_load_bitmap("..\\PNGS\\temp\\personnage.png");
+    assert(Personnage1 != NULL);
+    Personnage2 = al_load_bitmap("..\\PNGS\\temp\\personnage.png");
+    assert(Personnage2 != NULL);
+    Assiette = al_load_bitmap("..\\PNGS\\temp\\assiette.png");
+    assert(Assiette != NULL);
+    fond = al_load_bitmap("..\\images\\fond.jpg");
+    assert(fond != NULL);
+
+    //init
+    const char* charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
+    int window_width = al_get_display_width(fenetre);
+    int window_height = al_get_display_height(fenetre);
+    /**********************
+    *  CREATION DU MENU  *
+    **********************/
+
+    enum{ EXIT, NEWGAME, CHARGEGAME, OPTIONS};
+    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU};
 
 
-    al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
-    chargerImages(&imagescuisine);
-    chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
-    afficher_map(mapCuisine, &imagescuisine);
+    float abs = WIDTH / 62.4;
+    float ord = HEIGHT / 35.1;
 
+    sub Menu[4];
 
-    al_flip_display();
-    al_rest(15);
+    sub game = createSub(abs * 9, ord * 10, CHARGEGAME);
+    sub newgame = createSub(abs * 9, ord * 16, NEWGAME);
+    sub options = createSub(abs * 9, ord * 22, OPTIONS);
+    sub exit = createSub(abs * 9, ord * 28, EXIT);
 
+    Menu[0] = game;
+    Menu[1] = newgame;
+    Menu[2] = options;
+    Menu[3] = exit;
+
+    int pos = 0, state = MENUPRINCIPAL;
+
+    // Premier affichage
+    afficherImage(menu, 0, 0, 1);
+    afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+
+    // Boucle d'événements
+    al_start_timer(timer);
+    while(!fini) {
+        al_wait_for_event(queue, &event); // on pioche le prochain evenement dans la file
+        switch(event.type) {
+            case ALLEGRO_EVENT_DISPLAY_CLOSE: {
+                fini = true;
+                break;
+            }
+            case ALLEGRO_EVENT_KEY_DOWN: {
+                switch(event.keyboard.keycode){
+                    case ALLEGRO_KEY_DOWN :{
+                        switch(state){
+                            case MENUPRINCIPAL:{
+                                afficherImage(menu, 0, 0, 1);
+                                if(pos!=3){
+                                    afficherImage(fleche, Menu[pos+1].posX, Menu[pos+1].posY, 0);
+                                    pos = pos+1;
+                                }
+                                else{
+                                    afficherImage(fleche, Menu[0].posX, Menu[0].posY, 0);
+                                    pos = 0;
+                                }
+                                printf("state %d pos %d\n", state, pos);
+                            }
+                        }
+                        break;
+                    }
+                    case ALLEGRO_KEY_UP :{
+                        switch(state){
+                            case MENUPRINCIPAL:{
+                                afficherImage(menu, 0, 0, 1);
+                                if(pos!=0){
+                                    afficherImage(fleche, Menu[pos-1].posX, Menu[pos-1].posY, 0);
+                                    pos = pos-1;
+                                }
+                                else{
+                                    afficherImage(fleche, Menu[3].posX, Menu[3].posY, 0);
+                                    pos = 3;
+                                }
+                                printf("state %d pos %d\n", state, pos);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case ALLEGRO_KEY_ENTER:{
+                        switch(state){
+                            case MENUPRINCIPAL:{
+                                switch(pos){
+                                    case 0:{
+                                        state = NEW;
+                                        afficherImage(pseudo, 0, 0, 1);
+                                        printf("state %d pos %d\n", state, pos);
+                                        break;
+                                    }
+                                    case 1:{
+                                        state = CHARGE;
+                                        afficherImage(mrbeast, 0, 0, 1);
+                                        printf("state %d pos %d\n", state, pos);
+                                        break;
+                                    }
+                                    case 2:{
+                                        state = OPT;
+                                        afficherImage(mrbeast, 0, 0, 1);
+                                        printf("state %d pos %d\n", state, pos);
+                                        break;
+                                    }
+                                    case 3:{
+                                        state = QUIT;
+                                        afficherImage(confirm, 0, 0, 1);
+                                        printf("state %d pos %d\n", state, pos);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            case NEW : {
+                                state = JEU;
+                                al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
+                                chargerImages(&imagescuisine);
+                                chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
+                                afficher_map(mapCuisine, &imagescuisine);
+                                break;
+                            }
+                            case QUIT :{
+                                fini = true;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case ALLEGRO_KEY_ESCAPE:{
+                        if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == JEU){
+                            state = MENUPRINCIPAL;
+                            afficherImage(menu, 0, 0, 1);
+                            afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                        }
+                        break;
+                    }
+
+                }
+            }
+            case ALLEGRO_EVENT_TIMER: {
+                display();
+                break;
+            }
+
+        }
+
+    }
+
+    // Libérations
+    al_destroy_display(fenetre);
+    al_destroy_event_queue(queue);
+    al_destroy_timer(timer);
+    //al_destroy_font(ape);
     libererImages(&imagescuisine);
-    al_destroy_display(display);
-
+    destroy(mrbeast);
+    destroy(icone);
+    destroy(transparent);
+    destroy(menu);
+    destroy(R);
+    destroy(pseudo);
+    destroy(confirm);
     return 0;
 }

@@ -18,4 +18,12 @@ sub createSub(float x, float y, int type){
     return s;
 }
 
+typedef struct {
+    float x, y, longueur, hauteur, vitesse, collisionDetecter, score;
+} Joueur;
+
+typedef struct {
+    float x, y, longueur, hauteur;
+} Element;
+
 #endif //ESCOOKED_MENU_H
