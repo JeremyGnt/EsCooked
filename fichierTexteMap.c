@@ -2,14 +2,15 @@
 
 
 void chargerImages(ImagesCuisine *pMap) {
-    pMap->sol = al_load_bitmap("..");
-    pMap->plandetravail = al_load_bitmap("../plantravail.png");
+    pMap->sol1 = al_load_bitmap("../sol 1.png");
+    pMap->sol2 = al_load_bitmap("../sol 2.png");
+    pMap->frigomenthe = al_load_bitmap("../frigo menthe.png");
+    pMap->frigocitron = al_load_bitmap("../frigo citron.png");
+    pMap->frigolimonade = al_load_bitmap("../frigo limonade.png");
+    pMap->frigocanneasucre = al_load_bitmap("../frigo canne  a sucre.png");
     pMap->cuisson = al_load_bitmap("../plaque de cuisson.png");
-    pMap->decoupe = al_load_bitmap("../station de decoupe.png");
-    pMap->distribassiettes = al_load_bitmap("../distribassiettes.png");
-    pMap->poubelle = al_load_bitmap("../poubelle.png");
     pMap->sortie = al_load_bitmap("../sortie.png");
-    pMap->distributeur = al_load_bitmap("../distributeur.png");
+    pMap->decoupe = al_load_bitmap("../station de decoupe.png");
     pMap->frigo = al_load_bitmap("../frigo.png");
     pMap->verre = al_load_bitmap("../verre.png");
 }
