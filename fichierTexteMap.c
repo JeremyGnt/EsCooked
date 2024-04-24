@@ -4,6 +4,7 @@
 void chargerImages(ImagesCuisine *pMap) {
     pMap->sol1 = al_load_bitmap("../sol 1.png");
     pMap->sol2 = al_load_bitmap("../sol 2.png");
+    pMap->plandetravail = al_load_bitmap("../plan de travail.png");
     pMap->frigomenthe = al_load_bitmap("../frigo menthe.png");
     pMap->frigocitron = al_load_bitmap("../frigo citron.png");
     pMap->frigolimonade = al_load_bitmap("../frigo limonade.png");
@@ -13,7 +14,10 @@ void chargerImages(ImagesCuisine *pMap) {
     pMap->decoupe = al_load_bitmap("../station de decoupe.png");
     pMap->frigo = al_load_bitmap("../frigo.png");
     pMap->verre = al_load_bitmap("../verre.png");
+    pMap->poubelle = al_load_bitmap("../poubelle.png");
+    pMap->presseAgrume = al_load_bitmap("../presse agrume.png");
 }
+
 
 void libererImages(ImagesCuisine *pMap) {
     al_destroy_bitmap(pMap->sol);
@@ -52,46 +56,56 @@ void afficher_map(fichierTexteMap mapCuisine, ImagesCuisine *pImages) {
     for (int j = 0; j < NB_LIGNES; j++) {
         for (int i = 0; i < NB_COLONNES; i++) {
             switch (mapCuisine.map[i][j]) {
-                case 0:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->sol, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                case 2:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->plandetravail, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
                                    (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
                     break;
                 case 1:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->plandetravail,
-                                   (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
-                                   0);
-                    break;
-                case 2:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->cuisson,
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->sol1,
                                    (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
                                    0);
                     break;
                 case 3:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->decoupe,
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->sol2,
                                    (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
                                    0);
                     break;
-                case 5:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->distribassiettes,
+                case 30:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->frigomenthe,
                                    (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
                                    0);
                     break;
-                case 6:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->poubelle,
+                case 31:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->frigocitron,
                                    (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
                                    0);
                     break;
-                case 7:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->sortie, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                case 32:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->frigolimonade,
+                                   (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
+                                   0);
+                    break;
+                case 33:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->frigocanneasucre, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
                                    (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
                     break;
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->distributeur,
-                                   (i * TAILLE_CARRE) + mapCuisine.decalMapX, (j * TAILLE_CARRE) + mapCuisine.decalMapY,
-                                   0);
+                case 5:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->cuisson, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                   (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    break;
+                case 6: al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->poubelle, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                       (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    break;
+                case 7: al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->sortie, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                       (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    break;
+                case 8: al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->presseAgrume, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                       (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    break;
+                case 9: al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->decoupe, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                       (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    break;
+                case 10:
                     break;
                 default:
                     break;

@@ -20,6 +20,7 @@ typedef struct fichierTexteMap fichierTexteMap;
 
 struct ImagesCuisine {
     ALLEGRO_BITMAP *sol1;
+    ALLEGRO_BITMAP *plandetravail;
     ALLEGRO_BITMAP *sol2;
     ALLEGRO_BITMAP *frigomenthe;
     ALLEGRO_BITMAP *frigocitron;
@@ -30,6 +31,8 @@ struct ImagesCuisine {
     ALLEGRO_BITMAP *decoupe;
     ALLEGRO_BITMAP *verre;
     ALLEGRO_BITMAP *frigo;
+    ALLEGRO_BITMAP *poubelle;
+    ALLEGRO_BITMAP *presseAgrume;
 };
 
 typedef struct ImagesCuisine ImagesCuisine;
