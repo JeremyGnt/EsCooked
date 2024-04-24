@@ -8,7 +8,9 @@ add_executable(EScooked main.c
         commandes.c
         commandes.h
         fichierTexteMap.c
-        fichierTexteMap.h)
+        fichierTexteMap.h
+        deplacements.c
+        deplacements.h)
 
 IF(WIN32)
     target_link_libraries(EScooked -lmingw32 -lallegro-5.0.10-monolith-md-debug)
