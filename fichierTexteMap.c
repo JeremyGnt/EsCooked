@@ -2,20 +2,20 @@
 
 
 void chargerImages(ImagesCuisine *pMap) {
-    pMap->sol1 = al_load_bitmap("../sol 1.png");
-    pMap->sol2 = al_load_bitmap("../sol 2.png");
-    pMap->plandetravail = al_load_bitmap("../plan de travail.png");
-    pMap->frigomenthe = al_load_bitmap("../frigo menthe.png");
-    pMap->frigocitron = al_load_bitmap("../frigo citron.png");
-    pMap->frigolimonade = al_load_bitmap("../frigo limonade.png");
-    pMap->frigocanneasucre = al_load_bitmap("../frigo canne  a sucre.png");
-    pMap->cuisson = al_load_bitmap("../plaque de cuisson.png");
-    pMap->sortie = al_load_bitmap("../sortie.png");
-    pMap->decoupe = al_load_bitmap("../station de decoupe.png");
-    pMap->frigo = al_load_bitmap("../frigo.png");
-    pMap->verre = al_load_bitmap("../verre.png");
-    pMap->poubelle = al_load_bitmap("../poubelle.png");
-    pMap->presseAgrume = al_load_bitmap("../presse agrume.png");
+    pMap->sol1 = al_load_bitmap("../images/sol 1.png");
+    pMap->sol2 = al_load_bitmap("../images/sol 2.png");
+    pMap->plandetravail = al_load_bitmap("../images/plan de travail.png");
+    pMap->frigomenthe = al_load_bitmap("../images/frigo menthe.png");
+    pMap->frigocitron = al_load_bitmap("../images/frigo citron.png");
+    pMap->frigolimonade = al_load_bitmap("../images/frigo limonade.png");
+    pMap->frigocanneasucre = al_load_bitmap("../images/frigo canne  a sucre.png");
+    pMap->cuisson = al_load_bitmap("../images/plaque de cuisson.png");
+    pMap->sortie = al_load_bitmap("../images/sortie.png");
+    pMap->decoupe = al_load_bitmap("../images/station de decoupe.png");
+    pMap->frigo = al_load_bitmap("../images/frigo.png");
+    pMap->verre = al_load_bitmap("../images/verre.png");
+    pMap->poubelle = al_load_bitmap("../images/poubelle.png");
+    pMap->presseAgrume = al_load_bitmap("../images/presse agrume.png");
 }
 
 
@@ -110,6 +110,10 @@ void afficher_map(fichierTexteMap mapCuisine, ImagesCuisine *pImages) {
                                        (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
                     break;
                 case 10:
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->frigo, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                   (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
+                    al_draw_bitmap(mapCuisine.mapImages[i][j] = pImages->verre, (i * TAILLE_CARRE) + mapCuisine.decalMapX,
+                                   (j * TAILLE_CARRE) + mapCuisine.decalMapY, 0);
                     break;
                 default:
                     break;
@@ -118,36 +122,4 @@ void afficher_map(fichierTexteMap mapCuisine, ImagesCuisine *pImages) {
     }
 }
 
-int main() {
 
-    ALLEGRO_DISPLAY *display = NULL;
-    fichierTexteMap mapCuisine = {0};
-    ImagesCuisine imagescuisine;
-
-    assert(al_init());
-    assert(al_init_image_addon());
-    display = al_create_display(WIDTH, HEIGHT);
-    assert(display);
-    al_set_window_position(display, 0, 0);
-    al_clear_to_color(BLANCO);
-
-    ALLEGRO_BITMAP* fond = NULL;
-    fond = al_load_bitmap("../fond.jpg");
-    int window_width = al_get_display_width(display);
-    int window_height = al_get_display_height(display);
-
-
-    al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
-    chargerImages(&imagescuisine);
-    chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
-    afficher_map(mapCuisine, &imagescuisine);
-
-
-    al_flip_display();
-    al_rest(15);
-
-    libererImages(&imagescuisine);
-    al_destroy_display(display);
-
-    return 0;
-}

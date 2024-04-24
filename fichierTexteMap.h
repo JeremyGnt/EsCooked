@@ -10,6 +10,7 @@
 
 #ifndef ESCOOKED_FICHIERTEXTEMAP_H
 #define ESCOOKED_FICHIERTEXTEMAP_H
+
 struct fichierTexteMap {
     int map[NB_COLONNES][NB_LIGNES];
     ALLEGRO_BITMAP *mapImages[NB_COLONNES][NB_LIGNES];
@@ -36,4 +37,10 @@ struct ImagesCuisine {
 };
 
 typedef struct ImagesCuisine ImagesCuisine;
+
+void chargerImages(ImagesCuisine *pMap);
+void libererImages(ImagesCuisine *pMap);
+void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *mapCuisine);
+void afficher_map(fichierTexteMap mapCuisine, ImagesCuisine *pImages);
+
 #endif //ESCOOKED_FICHIERTEXTEMAP_H
