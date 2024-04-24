@@ -16,16 +16,18 @@ void chargerImages(ImagesCuisine *pMap) {
 }
 
 void libererImages(ImagesCuisine *pMap) {
-    al_destroy_bitmap(pMap->sol);
-    al_destroy_bitmap(pMap->plandetravail);
+    al_destroy_bitmap(pMap->sol1);
+    al_destroy_bitmap(pMap->sol2);
+    al_destroy_bitmap(pMap->frigomenthe);
+    al_destroy_bitmap(pMap->frigocitron);
+    al_destroy_bitmap(pMap->frigolimonade);
+    al_destroy_bitmap(pMap->frigocanneasucre);
     al_destroy_bitmap(pMap->cuisson);
-    al_destroy_bitmap(pMap->decoupe);
-    al_destroy_bitmap(pMap->distribassiettes);
-    al_destroy_bitmap(pMap->poubelle);
     al_destroy_bitmap(pMap->sortie);
-    al_destroy_bitmap(pMap->distributeur);
+    al_destroy_bitmap(pMap->decoupe);
+    al_destroy_bitmap(pMap->frigo);
+    al_destroy_bitmap(pMap->verre);
 }
-
 
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *mapCuisine) {
     FILE *fichier = fopen(nomFichier, "r");
