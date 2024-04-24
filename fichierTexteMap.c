@@ -2,7 +2,7 @@
 
 
 void chargerImages(ImagesCuisine *pMap) {
-    pMap->sol = al_load_bitmap("");
+    pMap->sol = al_load_bitmap("..");
     pMap->plandetravail = al_load_bitmap("../plantravail.png");
     pMap->cuisson = al_load_bitmap("../cuisson.png");
     pMap->decoupe = al_load_bitmap("../decoupe.png");
