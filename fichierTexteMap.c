@@ -4,12 +4,14 @@
 void chargerImages(ImagesCuisine *pMap) {
     pMap->sol = al_load_bitmap("..");
     pMap->plandetravail = al_load_bitmap("../plantravail.png");
-    pMap->cuisson = al_load_bitmap("../cuisson.png");
-    pMap->decoupe = al_load_bitmap("../decoupe.png");
+    pMap->cuisson = al_load_bitmap("../plaque de cuisson.png");
+    pMap->decoupe = al_load_bitmap("../station de decoupe.png");
     pMap->distribassiettes = al_load_bitmap("../distribassiettes.png");
     pMap->poubelle = al_load_bitmap("../poubelle.png");
     pMap->sortie = al_load_bitmap("../sortie.png");
     pMap->distributeur = al_load_bitmap("../distributeur.png");
+    pMap->frigo = al_load_bitmap("../frigo.png");
+    pMap->verre = al_load_bitmap("../verre.png");
 }
 
 void libererImages(ImagesCuisine *pMap) {
