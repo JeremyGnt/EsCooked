@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-
+/*
 
 typedef struct Boisson {
     char *nom;
@@ -98,7 +98,7 @@ int main() {
 
     return 0;
 }
-
+*/
 
 
 
