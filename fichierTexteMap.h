@@ -11,15 +11,13 @@
 #ifndef ESCOOKED_FICHIERTEXTEMAP_H
 #define ESCOOKED_FICHIERTEXTEMAP_H
 
-struct fichierTexteMap {
+typedef struct {
     int map[NB_COLONNES][NB_LIGNES];
     ALLEGRO_BITMAP *mapImages[NB_COLONNES][NB_LIGNES];
     int decalMapX, decalMapY;
-};
+} fichierTexteMap;
 
-typedef struct fichierTexteMap fichierTexteMap;
-
-struct ImagesCuisine {
+typedef struct {
     ALLEGRO_BITMAP *sol1;
     ALLEGRO_BITMAP *plandetravail;
     ALLEGRO_BITMAP *sol2;
@@ -34,9 +32,7 @@ struct ImagesCuisine {
     ALLEGRO_BITMAP *frigo;
     ALLEGRO_BITMAP *poubelle;
     ALLEGRO_BITMAP *presseAgrume;
-};
-
-typedef struct ImagesCuisine ImagesCuisine;
+} ImagesCuisine;
 
 void chargerImages(ImagesCuisine *pMap);
 void libererImages(ImagesCuisine *pMap);

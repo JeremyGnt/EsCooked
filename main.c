@@ -11,6 +11,7 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
+#include "math.h"
 #include "menu.h"
 #include "fichierTexteMap.h"
 
@@ -45,6 +46,7 @@ int main() {
     enum {ASSIETTE, TOMATE, STEAK, PAIN, BEACON, OIGNON};
 
     bool fini = false;
+    float angle = 0;
     int toucheEnfoncer[NB_TOUCHES_GEREES] = {0};
 
     ALLEGRO_DISPLAY* fenetre = NULL;
@@ -81,13 +83,13 @@ int main() {
     joueur1.hauteur = 60;
     joueur1.x = WIDTH / 2;
     joueur1.y = HEIGHT / 2;
-    joueur1.vitesse = 3;
+    joueur1.vitesse = 1;
 
     joueur2.longueur = 60;
     joueur2.hauteur = 60;
     joueur2.x = 0;
     joueur2.y = 0;
-    joueur2.vitesse = 3;
+    joueur2.vitesse = 1.5;
 
     assiette.longueur = 40;
     assiette.hauteur = 40;
@@ -309,20 +311,46 @@ int main() {
                         }
                     }
                 }
-                if (toucheEnfoncer[HAUT] && joueur1.y - joueur1.vitesse >= 0) {
+                if (toucheEnfoncer[HAUT]) {
+                    angle = 0;
+                }
+                if (toucheEnfoncer[BAS]) {
+                    angle = M_PI;
+                }
+                if (toucheEnfoncer[GAUCHE]) {
+                    angle = (3 * M_PI) / 2;
+                }
+                if (toucheEnfoncer[DROITE]) {
+                    angle = M_PI / 2;
+                }
+                if (toucheEnfoncer[HAUT] && toucheEnfoncer[GAUCHE]) {
+                    angle = (7 * M_PI) / 4;
+                }
+                if (toucheEnfoncer[HAUT] && toucheEnfoncer[DROITE]) {
+                    angle = M_PI / 4;
+                }
+                if (toucheEnfoncer[BAS] && toucheEnfoncer[GAUCHE]) {
+                    angle = (5 * M_PI) / 4;
+                }
+                if (toucheEnfoncer[BAS] && toucheEnfoncer[DROITE]) {
+                    angle = (3 * M_PI) / 4;
+                }
+
+                if (toucheEnfoncer[HAUT]) {
                     joueur1.y -= joueur1.vitesse;
                 }
-                if (toucheEnfoncer[BAS] && joueur1.y + joueur1.vitesse <= HEIGHT - joueur1.hauteur) {
+                if (toucheEnfoncer[BAS]) {
                     joueur1.y += joueur1.vitesse;
                 }
-                if (toucheEnfoncer[GAUCHE] && joueur1.x - joueur1.vitesse >= 0) {
+                if (toucheEnfoncer[GAUCHE]) {
                     joueur1.x -= joueur1.vitesse;
                 }
-                if (toucheEnfoncer[DROITE] && joueur1.x + joueur1.vitesse <= WIDTH - joueur1.longueur) {
+                if (toucheEnfoncer[DROITE]) {
                     joueur1.x += joueur1.vitesse;
                 }
+
                 afficherImage(transparent, 0, 0, 0);
-                al_draw_bitmap(Personnage1, joueur1.x - joueur1.longueur / 2, joueur1.y - joueur1.hauteur / 2, 0);
+                al_draw_rotated_bitmap(Personnage1, joueur1.longueur / 2, joueur1.hauteur / 2, joueur1.x, joueur1.y, angle, 0);
                 display();
             }
         }
