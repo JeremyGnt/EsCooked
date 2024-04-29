@@ -79,9 +79,9 @@ int main() {
 
     joueur1.longueur = 60;
     joueur1.hauteur = 60;
-    joueur1.x = WIDTH / 3;
+    joueur1.x = WIDTH / 2;
     joueur1.y = HEIGHT / 2;
-    joueur1.vitesse = 2;
+    joueur1.vitesse = 3;
 
     joueur2.longueur = 60;
     joueur2.hauteur = 60;
@@ -125,9 +125,9 @@ int main() {
     assert(pseudo!=NULL);
     confirm = al_load_bitmap("..\\PNGS\\temp\\confirmation.png");
     assert(confirm != NULL);
-    Personnage1 = al_load_bitmap("..\\PNGS\\temp\\personnage.png");
+    Personnage1 = al_load_bitmap("..\\images\\perso 1.png");
     assert(Personnage1 != NULL);
-    Personnage2 = al_load_bitmap("..\\PNGS\\temp\\personnage.png");
+    Personnage2 = al_load_bitmap("..\\images\\perso 2.png");
     assert(Personnage2 != NULL);
     Assiette = al_load_bitmap("..\\PNGS\\temp\\assiette.png");
     assert(Assiette != NULL);
@@ -170,7 +170,7 @@ int main() {
     // Boucle d'événements
     al_start_timer(timer);
     while(!fini) {
-        al_wait_for_event(queue, &event); // on pioche le prochain evenement dans la file
+        al_wait_for_event(queue, &event);
         switch(event.type) {
             case ALLEGRO_EVENT_DISPLAY_CLOSE: {
                 fini = true;
@@ -190,7 +190,6 @@ int main() {
                                     afficherImage(fleche, Menu[0].posX, Menu[0].posY, 0);
                                     pos = 0;
                                 }
-                                printf("state %d pos %d\n", state, pos);
                             }
                         }
                         break;
@@ -207,7 +206,6 @@ int main() {
                                     afficherImage(fleche, Menu[3].posX, Menu[3].posY, 0);
                                     pos = 3;
                                 }
-                                printf("state %d pos %d\n", state, pos);
                                 break;
                             }
                         }
@@ -220,25 +218,21 @@ int main() {
                                     case 0:{
                                         state = NEW;
                                         afficherImage(pseudo, 0, 0, 1);
-                                        printf("state %d pos %d\n", state, pos);
                                         break;
                                     }
                                     case 1:{
                                         state = CHARGE;
                                         afficherImage(mrbeast, 0, 0, 1);
-                                        printf("state %d pos %d\n", state, pos);
                                         break;
                                     }
                                     case 2:{
                                         state = OPT;
                                         afficherImage(mrbeast, 0, 0, 1);
-                                        printf("state %d pos %d\n", state, pos);
                                         break;
                                     }
                                     case 3:{
                                         state = QUIT;
                                         afficherImage(confirm, 0, 0, 1);
-                                        printf("state %d pos %d\n", state, pos);
                                         break;
                                     }
                                 }
@@ -249,7 +243,6 @@ int main() {
                                 al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
                                 chargerImages(&imagescuisine);
                                 chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
-                                afficher_map(mapCuisine, &imagescuisine);
                                 break;
                             }
                             case QUIT :{
@@ -267,16 +260,72 @@ int main() {
                         }
                         break;
                     }
-
+                }
+                case ALLEGRO_EVENT_TIMER: {
+                    display();
+                    break;
                 }
             }
-            case ALLEGRO_EVENT_TIMER: {
-                display();
-                break;
-            }
-
         }
-
+        switch(state) {
+            case JEU: {
+                afficher_map(mapCuisine, &imagescuisine);
+                if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+                    switch (event.keyboard.keycode) {
+                        case ALLEGRO_KEY_Z: {
+                            toucheEnfoncer[HAUT] = true;
+                            break;
+                        }
+                        case ALLEGRO_KEY_S: {
+                            toucheEnfoncer[BAS] = true;
+                            break;
+                        }
+                        case ALLEGRO_KEY_Q: {
+                            toucheEnfoncer[GAUCHE] = true;
+                            break;
+                        }
+                        case ALLEGRO_KEY_D: {
+                            toucheEnfoncer[DROITE] = true;
+                            break;
+                        }
+                    }
+                } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
+                    switch (event.keyboard.keycode) {
+                        case ALLEGRO_KEY_Z: {
+                            toucheEnfoncer[HAUT] = false;
+                            break;
+                        }
+                        case ALLEGRO_KEY_S: {
+                            toucheEnfoncer[BAS] = false;
+                            break;
+                        }
+                        case ALLEGRO_KEY_Q: {
+                            toucheEnfoncer[GAUCHE] = false;
+                            break;
+                        }
+                        case ALLEGRO_KEY_D: {
+                            toucheEnfoncer[DROITE] = false;
+                            break;
+                        }
+                    }
+                }
+                if (toucheEnfoncer[HAUT] && joueur1.y - joueur1.vitesse >= 0) {
+                    joueur1.y -= joueur1.vitesse;
+                }
+                if (toucheEnfoncer[BAS] && joueur1.y + joueur1.vitesse <= HEIGHT - joueur1.hauteur) {
+                    joueur1.y += joueur1.vitesse;
+                }
+                if (toucheEnfoncer[GAUCHE] && joueur1.x - joueur1.vitesse >= 0) {
+                    joueur1.x -= joueur1.vitesse;
+                }
+                if (toucheEnfoncer[DROITE] && joueur1.x + joueur1.vitesse <= WIDTH - joueur1.longueur) {
+                    joueur1.x += joueur1.vitesse;
+                }
+                afficherImage(transparent, 0, 0, 0);
+                al_draw_bitmap(Personnage1, joueur1.x - joueur1.longueur / 2, joueur1.y - joueur1.hauteur / 2, 0);
+                display();
+            }
+        }
     }
 
     // Libérations
@@ -285,6 +334,7 @@ int main() {
     al_destroy_timer(timer);
     //al_destroy_font(ape);
     libererImages(&imagescuisine);
+    al_destroy_bitmap(Personnage1);
     destroy(mrbeast);
     destroy(icone);
     destroy(transparent);
