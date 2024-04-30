@@ -49,7 +49,7 @@ struct imagesCommandes {
 };
 typedef struct imagesCommandes imagesCommandes;
 
-void chargerImages(struct imagesCommandes *imagesCommandes);
+void chargerImagesCommandes(struct imagesCommandes *imagesCommandes);
 
 void init_allegro(ALLEGRO_DISPLAY **display, ALLEGRO_TIMER **timer);
 

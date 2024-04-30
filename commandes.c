@@ -8,7 +8,7 @@
 #include "commandes.h"
 
 
-void chargerImages(struct imagesCommandes *imagesCommandes) {
+void chargerImagesCommandes(struct imagesCommandes *imagesCommandes) {
     imagesCommandes->tableauBitmap[0] = al_load_bitmap("../images/caipirinha.png");
     imagesCommandes->tableauBitmap[1] = al_load_bitmap("../images/mojito.png");
     imagesCommandes->tableauBitmap[2] = al_load_bitmap("../images/hintzy.png");
@@ -164,7 +164,7 @@ void dessinerToutMaillons(struct Maillon **pListe, imagesCommandes *images) {
         parcours = parcours->next;
     }
 }
-
+/*
 int main() {
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_DISPLAY *display = NULL;
@@ -219,3 +219,4 @@ int main() {
     return 0;
 }
 
+*/
