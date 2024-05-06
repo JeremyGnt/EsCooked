@@ -81,6 +81,7 @@ int main() {
     Element assiette;
     fichierTexteMap mapCuisine = {0};
     ImagesCuisine imagescuisine;
+    chargerImages(&imagescuisine);
 
     joueur1.longueur = 60;
     joueur1.hauteur = 60;
@@ -174,6 +175,7 @@ int main() {
         switch(state) {
             case JEU: {
                 al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
+                chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
                 afficher_map(mapCuisine, &imagescuisine);
                 if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
                     switch (event.keyboard.keycode) {
