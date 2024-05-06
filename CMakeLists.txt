@@ -12,7 +12,8 @@ add_executable(EScooked main.c
         deplacements.c
         deplacements.h
         deplacements.c
-        menu.c)
+        menu.c
+        varmenu.h)
 
 IF(WIN32)
     target_link_libraries(EScooked -lmingw32 -lallegro-5.0.10-monolith-md-debug)

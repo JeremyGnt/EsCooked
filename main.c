@@ -16,8 +16,6 @@
 #include "menu.h"
 
 
-
-
 void display(){
     al_flip_display();
 }
@@ -67,6 +65,15 @@ int main() {
     ALLEGRO_BITMAP* icone = NULL;
     icone = al_load_bitmap("..\\PNGS\\temp\\icone.png");
     assert(icone != NULL);
+
+
+    typedef struct {
+        float x, y, longueur, hauteur, vitesse, collisionDetecter, score;
+    } Joueur;
+
+    typedef struct {
+        float x, y, longueur, hauteur;
+    } Element;
 
     // Création des éléments
     Joueur joueur1;
@@ -137,26 +144,14 @@ int main() {
     int window_width = al_get_display_width(fenetre);
     int window_height = al_get_display_height(fenetre);
 
-    float abs = WIDTH / 62.4;
-    float ord = HEIGHT / 35.1;
 
-    sub Menu[4];
+    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU, OFF};
+    int state;
 
-    sub game = createSub(abs * 9, ord * 10, CHARGEGAME);
-    sub newgame = createSub(abs * 9, ord * 16, NEWGAME);
-    sub options = createSub(abs * 9, ord * 22, OPTIONS);
-    sub exit = createSub(abs * 9, ord * 28, EXIT);
-
-    Menu[0] = game;
-    Menu[1] = newgame;
-    Menu[2] = options;
-    Menu[3] = exit;
-
-    int pos = 0, state = MENUPRINCIPAL;
 
     // Premier affichage
     afficherImage(menu, 0, 0, 1);
-    afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+    declarationMenu(fleche);
 
     // Boucle d'événements
     al_start_timer(timer);
@@ -168,9 +163,8 @@ int main() {
                 break;
             }
             case ALLEGRO_EVENT_KEY_DOWN: {
-                menuf(&event, menu, fleche, pseudo, confirm,
-                      mrbeast, imagescuisine, fond, mapCuisine,
-                      &Menu[4], fini, window_width, window_height);
+                state = menuf(&event, menu, fleche, pseudo, confirm,
+                              mrbeast, imagescuisine, fond, mapCuisine, window_width, window_height);
                 case ALLEGRO_EVENT_TIMER: {
                     display();
                     break;
@@ -261,6 +255,11 @@ int main() {
                 afficherImage(transparent, 0, 0, 0);
                 al_draw_rotated_bitmap(Personnage1, joueur1.longueur / 2, joueur1.hauteur / 2, joueur1.x, joueur1.y, angle, 0);
                 display();
+                break;
+            }
+            case OFF: {
+                fini = true;
+                break;
             }
         }
     }

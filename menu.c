@@ -1,10 +1,6 @@
-//
-// Created by Enzol on 06/05/2024.
-//
-//
-// Created by Enzol on 24/04/2024.
-//
 #define NOIR al_map_rgb(0,0,0)
+#define WIDTH 1248
+#define HEIGHT 702
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
@@ -12,6 +8,7 @@
 #include <allegro5/allegro_primitives.h>
 #include "fichierTexteMap.h"
 #include "menu.h"
+#include "varmenu.h"
 
 void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
     if(R){
@@ -20,9 +17,25 @@ void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
     al_draw_bitmap(buh, x, y, 0);
 }
 
-void menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
-           ALLEGRO_BITMAP* mrbeast, ImagesCuisine imagescuisine, ALLEGRO_BITMAP* fond, fichierTexteMap mapCuisine,
-           sub Menu[4], bool fini, int window_width, int window_height){
+void declarationMenu(ALLEGRO_BITMAP* fleche){
+
+    sub game = createSub(absc * 9, ord * 10, CHARGEGAME);
+    sub newgame = createSub(absc * 9, ord * 16, NEWGAME);
+    sub options = createSub(absc * 9, ord * 22, OPTIONS);
+    sub exit = createSub(absc * 9, ord * 28, EXIT);
+
+    Menu[0] = game;
+    Menu[1] = newgame;
+    Menu[2] = options;
+    Menu[3] = exit;
+
+    afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+}
+
+
+
+int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
+          ALLEGRO_BITMAP* mrbeast, ImagesCuisine imagescuisine, ALLEGRO_BITMAP* fond, fichierTexteMap mapCuisine, int window_width, int window_height){
     switch(event->keyboard.keycode){
         case ALLEGRO_KEY_DOWN :{
             switch(state){
@@ -92,7 +105,7 @@ void menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, A
                     break;
                 }
                 case QUIT :{
-                    fini = true;
+                    state = OFF;
                     break;
                 }
             }
@@ -107,4 +120,5 @@ void menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, A
             break;
         }
     }
+    return state;
 }
