@@ -323,7 +323,7 @@ GameResources *initGameResources() {
     // Initialisation et chargement de la police
     al_init_font_addon(); // Initialisation du module de police
     al_init_ttf_addon();  // Support des polices TTF
-    resources->font = al_load_ttf_font("../font/Jersey25-Regular.ttf", 36, 0);
+    resources->font = al_load_ttf_font("../PNGS/fonts/Jersey25-Regular.ttf", 36, 0);
     if (!resources->font) {
         fprintf(stderr, "Failed to load font\n");
         // Ajoutez un traitement approprié, par exemple un nettoyage et sortie

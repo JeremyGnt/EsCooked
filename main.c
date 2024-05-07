@@ -52,6 +52,7 @@ int main() {
     // Déclarations
 
     bool fini = false;
+
     GameResources *resources = initGameResources();
     if (!resources) {
         fprintf(stderr, "Failed to initialize game resources\n");
