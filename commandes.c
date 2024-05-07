@@ -1,14 +1,9 @@
-#include <allegro5/allegro.h>
-#include <stdio.h>
-#include <string.h>
-#include <allegro5/allegro_image.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/allegro_primitives.h>
 #include "commandes.h"
+double get_current_time() {
+    return al_get_time();
+}
 
-
-void chargerImagesCommandes(struct imagesCommandes *imagesCommandes) {
+void chargerImages(struct imagesCommandes *imagesCommandes) {
     imagesCommandes->tableauBitmap[0] = al_load_bitmap("../images/caipirinha.png");
     imagesCommandes->tableauBitmap[1] = al_load_bitmap("../images/mojito.png");
     imagesCommandes->tableauBitmap[2] = al_load_bitmap("../images/hintzy.png");
@@ -18,25 +13,6 @@ void chargerImagesCommandes(struct imagesCommandes *imagesCommandes) {
     imagesCommandes->tableauBitmap[6] = al_load_bitmap("../images/HINTZY_COMMANDE.png");
     imagesCommandes->tableauBitmap[7] = al_load_bitmap("../images/CAIPIRINHA_COMMANDE.png");
     imagesCommandes->tableauBitmap[8] = al_load_bitmap("../images/pierre.png");
-}
-
-void init_allegro(ALLEGRO_DISPLAY **display, ALLEGRO_TIMER **timer) {
-    al_init();
-    al_init_primitives_addon();
-    al_init_font_addon();
-    al_init_ttf_addon();
-    assert(al_init_primitives_addon());
-    assert(al_init_image_addon());
-
-    *display = al_create_display(WINDOW_WIDTH, WINDOW_HEIGHT);
-    al_set_window_position(*display, 0, 0);
-
-    *timer = al_create_timer(1.0 / 120);  //config timer
-    al_start_timer(*timer);
-}
-
-double get_current_time() {
-    return al_get_time();
 }
 
 int nombreMaillons(struct Maillon **pListe) {
@@ -94,7 +70,7 @@ void supprimerMaillonsExpire(struct Maillon **pListe) {
     }
 }
 
-void libererListe(struct Maillon **pListe) {
+void libererListeCommande(struct Maillon **pListe) {
     struct Maillon *courant = *pListe;
     while (courant != NULL) {
         struct Maillon *temp = courant;
@@ -164,59 +140,3 @@ void dessinerToutMaillons(struct Maillon **pListe, imagesCommandes *images) {
         parcours = parcours->next;
     }
 }
-/*
-int main() {
-    ALLEGRO_TIMER *timer = NULL;
-    ALLEGRO_DISPLAY *display = NULL;
-
-    imagesCommandes imagesCommandes;
-
-    init_allegro(&display, &timer);
-
-    chargerImages(&imagesCommandes);
-
-    struct Maillon *liste = NULL;
-    struct Recette *recettes[NB_RECETTES] = {&mojito, &caipirinha, &hintzy, &plaza};
-
-    ALLEGRO_EVENT_QUEUE *event_queue = al_create_event_queue();
-    al_register_event_source(event_queue, al_get_display_event_source(display));
-    al_register_event_source(event_queue, al_get_timer_event_source(timer));
-
-    bool running = true;
-    while (running) {
-        ALLEGRO_EVENT ev;
-        al_wait_for_event(event_queue, &ev);
-
-        switch (ev.type) {
-            case ALLEGRO_EVENT_TIMER:
-                // Mettre à jour les maillons, dessiner à chaque tick du timer
-                supprimerMaillonsExpire(&liste);
-                if (liste == NULL ||
-                    (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
-                    ajouterMaillonFin(&liste, recettes);
-                }
-                al_clear_to_color(al_map_rgb(0, 0, 0)); // Effacer l'écran
-                dessinerToutMaillons(&liste, &imagesCommandes); // Dessiner tous les maillons
-                al_flip_display();
-                break;
-
-            case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                // Gérer la fermeture de la fenêtre
-                running = false;
-                break;
-
-            default:
-                // Gérer d'autres types d'événements si nécessaire
-                break;
-        }
-    }
-
-    libererListe(&liste);
-    al_destroy_display(display);
-    al_destroy_timer(timer);
-    al_destroy_event_queue(event_queue);
-
-    return 0;
-}
-
-*/

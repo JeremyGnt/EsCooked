@@ -1,16 +1,8 @@
 #ifndef ESCOOKED_COMMANDES_H
 #define ESCOOKED_COMMANDES_H
 
-#define WINDOW_WIDTH 1248
-#define WINDOW_HEIGHT 702
-
-#define DUREE_VIE 3
-#define MAX_MAILLONS 5
-#define NB_RECETTES 4
-#define FREQUENCE_NOUVELLE_RECETTE 120
-#define NOMBRE_IMAGES 9
-
-
+#include "general.h"
+/// commandes ///
 enum Ingredients {
     CITRON_PRESSE,
     ALCOOL_CUIT,
@@ -31,12 +23,6 @@ struct Recette {
     int ingredients[5];
 };
 
-// Initialisation avec ID
-struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
-struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
-struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
-struct Recette plaza = {PLAZA, {LIMONADE, CITRON_PRESSE, INGREDIENT_NULL}};
-
 struct Maillon {
     struct Recette *recette;
     double tempsCreation;
@@ -48,23 +34,13 @@ struct imagesCommandes {
 
 };
 typedef struct imagesCommandes imagesCommandes;
-
-void chargerImagesCommandes(struct imagesCommandes *imagesCommandes);
-
-void init_allegro(ALLEGRO_DISPLAY **display, ALLEGRO_TIMER **timer);
-
-double get_current_time();
-
+void chargerImages(struct imagesCommandes *imagesCommandes);
 int nombreMaillons(struct Maillon **pListe);
-
 void ajouterMaillonFin(struct Maillon **pListe, struct Recette *recettes[NB_RECETTES]);
-
 void supprimerMaillonsExpire(struct Maillon **pListe);
-
-void libererListe(struct Maillon **pListe);
-
+void libererListeCommande(struct Maillon **pListe);
 void dessinerMaillon(struct Maillon *maillon, struct imagesCommandes *images, float x, float y);
-
 void dessinerToutMaillons(struct Maillon **pListe, imagesCommandes *images);
+
 
 #endif

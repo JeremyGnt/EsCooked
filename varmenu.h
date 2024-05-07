@@ -26,7 +26,7 @@ sub createSub(float x, float y, int type){
 enum{ EXIT, NEWGAME, CHARGEGAME, OPTIONS};
 enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU, OFF};
 
-int pos = 0, state = MENUPRINCIPAL;
+int pos = 0;
 
 float absc = WIDTH / 62.4;
 float ord = HEIGHT / 35.1;
