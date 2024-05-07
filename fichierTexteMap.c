@@ -56,6 +56,8 @@ void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *mapCuisi
     fclose(fichier);
 }
 
+
+
 void afficher_map(fichierTexteMap mapCuisine, ImagesCuisine *pImages) {
     for (int j = 0; j < NB_LIGNES; j++) {
         for (int i = 0; i < NB_COLONNES; i++) {

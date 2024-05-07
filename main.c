@@ -12,15 +12,9 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
 #include "math.h"
-#include "menu.h"
 #include "fichierTexteMap.h"
+#include "menu.h"
 
-void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
-    if(R){
-        al_clear_to_color(NOIR);
-    }
-    al_draw_bitmap(buh, x, y, 0);
-}
 
 void display(){
     al_flip_display();
@@ -72,12 +66,22 @@ int main() {
     icone = al_load_bitmap("..\\PNGS\\temp\\icone.png");
     assert(icone != NULL);
 
+
+    typedef struct {
+        float x, y, longueur, hauteur, vitesse, collisionDetecter, score;
+    } Joueur;
+
+    typedef struct {
+        float x, y, longueur, hauteur;
+    } Element;
+
     // Création des éléments
     Joueur joueur1;
     Joueur joueur2;
     Element assiette;
     fichierTexteMap mapCuisine = {0};
     ImagesCuisine imagescuisine;
+    chargerImages(&imagescuisine);
 
     joueur1.longueur = 60;
     joueur1.hauteur = 60;
@@ -140,34 +144,15 @@ int main() {
     const char* charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
     int window_width = al_get_display_width(fenetre);
     int window_height = al_get_display_height(fenetre);
-    /**********************
-    *  CREATION DU MENU  *
-    **********************/
-
-    enum{ EXIT, NEWGAME, CHARGEGAME, OPTIONS};
-    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU};
 
 
-    float abs = WIDTH / 62.4;
-    float ord = HEIGHT / 35.1;
+    enum{ MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU, OFF};
+    int state;
 
-    sub Menu[4];
-
-    sub game = createSub(abs * 9, ord * 10, CHARGEGAME);
-    sub newgame = createSub(abs * 9, ord * 16, NEWGAME);
-    sub options = createSub(abs * 9, ord * 22, OPTIONS);
-    sub exit = createSub(abs * 9, ord * 28, EXIT);
-
-    Menu[0] = game;
-    Menu[1] = newgame;
-    Menu[2] = options;
-    Menu[3] = exit;
-
-    int pos = 0, state = MENUPRINCIPAL;
 
     // Premier affichage
     afficherImage(menu, 0, 0, 1);
-    afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+    declarationMenu(fleche);
 
     // Boucle d'événements
     al_start_timer(timer);
@@ -179,90 +164,8 @@ int main() {
                 break;
             }
             case ALLEGRO_EVENT_KEY_DOWN: {
-                switch(event.keyboard.keycode){
-                    case ALLEGRO_KEY_DOWN :{
-                        switch(state){
-                            case MENUPRINCIPAL:{
-                                afficherImage(menu, 0, 0, 1);
-                                if(pos!=3){
-                                    afficherImage(fleche, Menu[pos+1].posX, Menu[pos+1].posY, 0);
-                                    pos = pos+1;
-                                }
-                                else{
-                                    afficherImage(fleche, Menu[0].posX, Menu[0].posY, 0);
-                                    pos = 0;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    case ALLEGRO_KEY_UP :{
-                        switch(state){
-                            case MENUPRINCIPAL:{
-                                afficherImage(menu, 0, 0, 1);
-                                if(pos!=0){
-                                    afficherImage(fleche, Menu[pos-1].posX, Menu[pos-1].posY, 0);
-                                    pos = pos-1;
-                                }
-                                else{
-                                    afficherImage(fleche, Menu[3].posX, Menu[3].posY, 0);
-                                    pos = 3;
-                                }
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    case ALLEGRO_KEY_ENTER:{
-                        switch(state){
-                            case MENUPRINCIPAL:{
-                                switch(pos){
-                                    case 0:{
-                                        state = NEW;
-                                        afficherImage(pseudo, 0, 0, 1);
-                                        break;
-                                    }
-                                    case 1:{
-                                        state = CHARGE;
-                                        afficherImage(mrbeast, 0, 0, 1);
-                                        break;
-                                    }
-                                    case 2:{
-                                        state = OPT;
-                                        afficherImage(mrbeast, 0, 0, 1);
-                                        break;
-                                    }
-                                    case 3:{
-                                        state = QUIT;
-                                        afficherImage(confirm, 0, 0, 1);
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                            case NEW : {
-                                state = JEU;
-                                al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
-                                chargerImages(&imagescuisine);
-                                chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
-                                break;
-                            }
-                            case QUIT :{
-                                fini = true;
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                    case ALLEGRO_KEY_ESCAPE:{
-                        if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == JEU){
-                            state = MENUPRINCIPAL;
-                            afficherImage(menu, 0, 0, 1);
-                            afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
-                        }
-                        break;
-                    }
-                }
+                state = menuf(&event, menu, fleche, pseudo, confirm,
+                              mrbeast, imagescuisine, fond, mapCuisine, window_width, window_height);
                 case ALLEGRO_EVENT_TIMER: {
                     display();
                     break;
@@ -271,6 +174,8 @@ int main() {
         }
         switch(state) {
             case JEU: {
+                al_draw_scaled_bitmap(fond, 0, 0, al_get_bitmap_width(fond), al_get_bitmap_height(fond), 0, 0, window_width, window_height, 0);
+                chargerEtLireFichierTexte("../map1.txt", &mapCuisine);
                 afficher_map(mapCuisine, &imagescuisine);
                 if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
                     switch (event.keyboard.keycode) {
@@ -352,6 +257,11 @@ int main() {
                 afficherImage(transparent, 0, 0, 0);
                 al_draw_rotated_bitmap(Personnage1, joueur1.longueur / 2, joueur1.hauteur / 2, joueur1.x, joueur1.y, angle, 0);
                 display();
+                break;
+            }
+            case OFF: {
+                fini = true;
+                break;
             }
         }
     }
