@@ -45,9 +45,13 @@ typedef struct {
     ALLEGRO_BITMAP *presseAgrume;
     ALLEGRO_BITMAP *fond;
     ALLEGRO_BITMAP *macaronTemps;
-
 } GameResources;
-enum {BAS, HAUT, GAUCHE, DROITE, FBAS, FHAUT, FGAUCHE, FDROITE, ESPACE, NB_TOUCHES_GEREES};
+
+typedef struct {
+    int x, y;
+} Ingredients;
+
+enum {BAS, HAUT, GAUCHE, DROITE, ESPACE};
 
 void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2);
 void update_player_position(Joueur *joueur, fichierTexteMap *map);
