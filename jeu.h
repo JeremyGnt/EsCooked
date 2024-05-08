@@ -58,7 +58,7 @@ void update_player_position(Joueur *joueur, fichierTexteMap *map);
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map);
 void afficher_map(fichierTexteMap map, GameResources *resources);
 void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources);
-void agir(Joueur *joueur1, Joueur *joueur2, GameResources *resources);
+void agir(Joueur *joueur1, GameResources *resources, fichierTexteMap *map);
 
 GameResources* initGameResources();
 void destroyGameResources(GameResources *resources);
