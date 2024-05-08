@@ -11,7 +11,9 @@ add_executable(EScooked main.c
         varmenu.h
         jeu.c
         jeu.h
-        general.h)
+        general.h
+        sons.c
+        sons.h)
 
 IF(WIN32)
     target_link_libraries(EScooked -lmingw32 -lallegro-5.0.10-monolith-md-debug)

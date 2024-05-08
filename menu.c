@@ -7,46 +7,9 @@
 #include "stdio.h"
 #include "menu.h"
 #include "varmenu.h"
+#include "sons.h"
 #define NOIR al_map_rgb(0,0,0)
 
-
-ALLEGRO_SAMPLE *music_menu = NULL;
-ALLEGRO_SAMPLE *music_game = NULL;
-ALLEGRO_SAMPLE_ID music_id;
-
-void jouerMusique(ALLEGRO_SAMPLE *music, ALLEGRO_PLAYMODE playmode) {
-    al_stop_sample(&music_id);
-    al_play_sample(music, 1.0, 0.0, 1.0, playmode, &music_id);
-}
-
-int initialiserRessourcesAudio(){
-    if (!al_install_audio()) {
-        fprintf(stderr, "Failed to initialize audio!\n");
-        return -1;
-    }
-
-    if (!al_init_acodec_addon()) {
-        fprintf(stderr, "Failed to initialize audio codecs!\n");
-        return -1;
-    }
-
-    if (!al_reserve_samples(10)) {
-        fprintf(stderr, "Failed to reserve samples!\n");
-        return -1;
-    }
-
-    ALLEGRO_SAMPLE *music_menu = al_load_sample("../Sons/rainy-day-in-town-with-birds-singing-194011.mp3");
-    if (!music_menu) {
-        fprintf(stderr, "Failed to load music for menu.\n");
-        al_destroy_sample(music_menu);
-    }
-
-    ALLEGRO_SAMPLE *music_game = al_load_sample("../Sons/epic-music-loop-17027.mp3");
-    if (!music_game) {
-        fprintf(stderr, "Failed to load music for game.\n");
-        al_destroy_sample(music_game);
-    }
-}
 
 void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
     if(R){
@@ -72,7 +35,8 @@ void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu){
 }
 
 int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
-          ALLEGRO_BITMAP* mrbeast, int state){
+          ALLEGRO_BITMAP* mrbeast, int state,Sons *son){
+    jouerMusiqueMenu(&son);
     switch(event->keyboard.keycode){
         case ALLEGRO_KEY_DOWN :{
             switch(state){
@@ -114,24 +78,24 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                         case 0:{
                             state = NEW;
                             afficherImage(pseudo, 0, 0, 1);
-                            /*
-                            jouerMusique(music_game, ALLEGRO_PLAYMODE_LOOP);
-                             */
                             break;
                         }
                         case 1:{
                             state = CHARGE;
                             afficherImage(mrbeast, 0, 0, 1);
+                            arreterMusiqueMenu(&son);
                             break;
                         }
                         case 2:{
                             state = OPT;
                             afficherImage(mrbeast, 0, 0, 1);
+                            arreterMusiqueMenu(&son);
                             break;
                         }
                         case 3:{
                             state = QUIT;
                             afficherImage(confirm, 0, 0, 1);
+                            arreterMusiqueMenu(&son);
                             break;
                         }
                     }
@@ -153,9 +117,7 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                 state = MENUPRINCIPAL;
                 afficherImage(menu, 0, 0, 1);
                 afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
-                /*
-                jouerMusique(music_menu, ALLEGRO_PLAYMODE_LOOP);
-                 */
+                jouerMusiqueMenu(&son);
             }
             break;
         }

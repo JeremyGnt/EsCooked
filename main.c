@@ -10,6 +10,7 @@
 #include "general.h"
 #include "jeu.h"
 #include "menu.h"
+#include "sons.h"
 
 
 #define NBMENU 20
@@ -33,7 +34,6 @@ int main() {
     al_init_font_addon();
     al_init_ttf_addon();
 
-   initialiserRessourcesAudio();
 
     // Déclarations
 
@@ -44,6 +44,8 @@ int main() {
         fprintf(stderr, "Failed to initialize game resources\n");
         return 1;
     }
+
+    Sons son;
 
     //BITMAPS
     ALLEGRO_BITMAP *mrbeast = NULL;
@@ -120,7 +122,7 @@ int main() {
         return -1;
     }
 
-
+    initialiserRessourcesAudio(&son);
 
 
     // Boucle d'événements
@@ -137,7 +139,7 @@ int main() {
             case ALLEGRO_EVENT_KEY_DOWN: {
                 if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == MENUPRINCIPAL){
                     state = menuf(&event, menu, fleche, pseudo, confirm,
-                                  mrbeast, state);
+                                  mrbeast, state,&son);
                     if(state == JEU){
                         jeu(&joueur1, &joueur2, resources);
                     }
@@ -164,7 +166,5 @@ int main() {
     destroy(R);
     destroy(pseudo);
     destroy(confirm);
-    al_destroy_sample(music_menu);
-    al_destroy_sample(music_game);
     return 0;
 }
