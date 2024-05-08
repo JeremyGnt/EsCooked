@@ -139,7 +139,7 @@ int main() {
             case ALLEGRO_EVENT_KEY_DOWN: {
                 if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == MENUPRINCIPAL){
                     state = menuf(&event, menu, fleche, pseudo, confirm,
-                                  mrbeast, state,&son);
+                                  mrbeast, state, son);
                     if(state == JEU){
                         jeu(&joueur1, &joueur2, resources);
                     }

@@ -12,7 +12,7 @@
 
 
 int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
-          ALLEGRO_BITMAP* mrbeast, int state, Sons *son);
+          ALLEGRO_BITMAP* mrbeast, int state, Sons son);
 
 void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu);
 
