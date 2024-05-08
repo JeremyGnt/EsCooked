@@ -166,7 +166,7 @@ void update_player_position(Joueur *joueur, fichierTexteMap *map) {
         isMoving = true;
     }
     if (joueur->toucheEnfoncer[BAS]) {
-        newY += joueur->vitesse;
+        newY += joueur->vitesse + 1; // +1 pour que le joueur aille à la meme vitesse dans tous les sens
         joueur->angle = M_PI; // 180 degrés pour aller vers le bas
         isMoving = true;
     }
@@ -181,7 +181,7 @@ void update_player_position(Joueur *joueur, fichierTexteMap *map) {
         isMoving = true;
     }
     if (joueur->toucheEnfoncer[DROITE]) {
-        newX += joueur->vitesse;
+        newX += joueur->vitesse + 1; // +1 pour que le joueur aille à la meme vitesse dans tous les sens
         if (!isMoving) {
             joueur->angle = M_PI / 2; // 90 degrés pour aller à droite
         } else {
