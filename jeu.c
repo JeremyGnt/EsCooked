@@ -2,6 +2,7 @@
 #include "general.h"
 #include "commandes.h"
 
+
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
     FILE *fichier = fopen(nomFichier, "r");
     if (fichier == NULL) {
@@ -362,7 +363,7 @@ void destroyGameResources(GameResources *resources) {
             al_destroy_event_queue(resources->event_queue);
         }
 
-        free(resources);  // Finally, free the structure itself
+        free(resources);
     }
 }
 

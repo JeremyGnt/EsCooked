@@ -5,6 +5,8 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "general.h"
 #include "jeu.h"
 #include "menu.h"
@@ -26,8 +28,12 @@ int main() {
     assert(al_install_keyboard());
     assert(al_init_primitives_addon());
     assert(al_init_image_addon());
+    assert(al_install_audio());
+    assert(al_init_acodec_addon());
     al_init_font_addon();
     al_init_ttf_addon();
+
+   initialiserRessourcesAudio();
 
     // Déclarations
 
@@ -158,5 +164,7 @@ int main() {
     destroy(R);
     destroy(pseudo);
     destroy(confirm);
+    al_destroy_sample(music_menu);
+    al_destroy_sample(music_game);
     return 0;
 }

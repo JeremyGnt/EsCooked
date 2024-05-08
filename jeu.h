@@ -16,7 +16,8 @@ typedef struct {
     char nom[50];            // Nom du joueur
     bool toucheEnfoncer[4];  // État des touches [HAUT, BAS, GAUCHE, DROITE]
     float vitesse;           // Vitesse de déplacement du joueur
-    float angle;             // Angle de déplacement pour l'affichage orienté
+    float angle;       // Angle de déplacement pour l'affichage orienté
+    int holding;
 } Joueur;
 
 typedef struct {
