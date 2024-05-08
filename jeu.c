@@ -94,7 +94,70 @@ void afficher_map(fichierTexteMap map, GameResources *resources) {
     }
 }
 
-void agir(Joueur *joueur1, Joueur *joueur2, GameResources *resources) {
+void agir(Joueur *joueur, GameResources *resources, fichierTexteMap *map) {
+    joueur->ingredientPorte = false;
+    if (joueur->toucheEnfoncer[ESPACE]) {
+        int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
+        int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
+        // Verre
+        if (map->map[mapX + 1][mapY] == 10 || map->map[mapX - 1][mapY] == 10 || map->map[mapX][mapY + 1] == 10 || map->map[mapX][mapY - 1] == 10) {
+            Ingredients ingredient;
+            ingredient.x = joueur->x + al_get_bitmap_width(joueur->bitmap);
+            ingredient.y = joueur->y;
+            int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+            int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+            al_draw_bitmap(resources->sol1, ingredient.x - bitmap_width, ingredient.y - bitmap_height / 2, 0);
+            joueur->toucheEnfoncer[ESPACE] = false;
+            joueur->ingredientPorte = true;
+        }
+        // Menthe
+        if (map->map[mapX + 1][mapY] == 30 || map->map[mapX - 1][mapY] == 30 || map->map[mapX][mapY + 1] == 30 || map->map[mapX][mapY - 1] == 30) {
+            Ingredients ingredient;
+            ingredient.x = joueur->x + al_get_bitmap_width(joueur->bitmap);
+            ingredient.y = joueur->y;
+            int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+            int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+            al_draw_bitmap(resources->sol1, ingredient.x - bitmap_width, ingredient.y - bitmap_height / 2, 0);
+            joueur->toucheEnfoncer[ESPACE] = false;
+            joueur->ingredientPorte = true;
+        }
+        // Citron
+        if (map->map[mapX + 1][mapY] == 31 || map->map[mapX - 1][mapY] == 31 || map->map[mapX][mapY + 1] == 31 || map->map[mapX][mapY - 1] == 31) {
+            Ingredients ingredient;
+            ingredient.x = joueur->x + al_get_bitmap_width(joueur->bitmap);
+            ingredient.y = joueur->y;
+            int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+            int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+            al_draw_bitmap(resources->sol1, ingredient.x - bitmap_width, ingredient.y - bitmap_height / 2, 0);
+            joueur->toucheEnfoncer[ESPACE] = false;
+            joueur->ingredientPorte = true;
+        }
+        // Limonade
+        if (map->map[mapX + 1][mapY] == 32 || map->map[mapX - 1][mapY] == 32 || map->map[mapX][mapY + 1] == 32 || map->map[mapX][mapY - 1] == 32) {
+            Ingredients ingredient;
+            ingredient.x = joueur->x + al_get_bitmap_width(joueur->bitmap);
+            ingredient.y = joueur->y;
+            int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+            int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+            al_draw_bitmap(resources->sol1, ingredient.x - bitmap_width, ingredient.y - bitmap_height / 2, 0);
+            joueur->toucheEnfoncer[ESPACE] = false;
+            joueur->ingredientPorte = true;
+        }
+        // Canne à sucre
+        if (map->map[mapX + 1][mapY] == 33 || map->map[mapX - 1][mapY] == 33 || map->map[mapX][mapY + 1] == 33 || map->map[mapX][mapY - 1] == 33) {
+            Ingredients ingredient;
+            ingredient.x = joueur->x + al_get_bitmap_width(joueur->bitmap);
+            ingredient.y = joueur->y;
+            int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+            int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+            al_draw_bitmap(resources->sol1, ingredient.x - bitmap_width, ingredient.y - bitmap_height / 2, 0);
+            joueur->toucheEnfoncer[ESPACE] = false;
+            joueur->ingredientPorte = true;
+        }
+        // il faut réussir à afficher de manière permanente la nouvelle image
+    }
+    // tant que joueur->ingredientPorte = true, l'image de l'ingrédient doit suivre la position du joueur tout en étant devant (utilisation de l'angle de vue du joueur)
+    // quand joueur->ingredientPorte = false, l'image de l'ingrédient ne doit plus suivre la posistion du joueur mais doit continuer à être dessiner
 }
 
 void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2) {
@@ -111,6 +174,9 @@ void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
                 break;
             case ALLEGRO_KEY_D:
                 joueur1->toucheEnfoncer[DROITE] = true;
+                break;
+            case ALLEGRO_KEY_SPACE:
+                joueur1->toucheEnfoncer[ESPACE] = true;
                 break;
             case ALLEGRO_KEY_UP:
                 joueur2->toucheEnfoncer[HAUT] = true;
@@ -435,6 +501,7 @@ void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources) {
                 dessinerToutMaillons(&liste, &imagesCommandes);
                 update_player_position(joueur1, &map);
                 update_player_position(joueur2, &map);
+                agir(joueur1, resources, &map);
                 afficherTemps(resources);
                 al_flip_display();
                 break;
