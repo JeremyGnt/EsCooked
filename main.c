@@ -5,9 +5,12 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include "general.h"
 #include "jeu.h"
 #include "menu.h"
+#include "sons.h"
 
 
 #define NBMENU 20
@@ -26,8 +29,11 @@ int main() {
     assert(al_install_keyboard());
     assert(al_init_primitives_addon());
     assert(al_init_image_addon());
+    assert(al_install_audio());
+    assert(al_init_acodec_addon());
     al_init_font_addon();
     al_init_ttf_addon();
+
 
     // Déclarations
 
@@ -38,6 +44,8 @@ int main() {
         fprintf(stderr, "Failed to initialize game resources\n");
         return 1;
     }
+
+    Sons son;
 
     //BITMAPS
     ALLEGRO_BITMAP *mrbeast = NULL;
@@ -114,7 +122,7 @@ int main() {
         return -1;
     }
 
-
+    initialiserRessourcesAudio(&son);
 
 
     // Boucle d'événements
@@ -131,7 +139,7 @@ int main() {
             case ALLEGRO_EVENT_KEY_DOWN: {
                 if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == MENUPRINCIPAL){
                     state = menuf(&event, menu, fleche, pseudo, confirm,
-                                  mrbeast, state);
+                                  mrbeast, state, son);
                     if(state == JEU){
                         jeu(&joueur1, &joueur2, resources);
                     }
