@@ -35,8 +35,7 @@ void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu){
 }
 
 int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
-          ALLEGRO_BITMAP* mrbeast, int state,Sons son){
-    jouerMusiqueMenu(&son);
+          ALLEGRO_BITMAP* mrbeast, int state,Sons *son){
     switch(event->keyboard.keycode){
         case ALLEGRO_KEY_DOWN :{
             switch(state){
@@ -78,27 +77,25 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                         case 0:{
                             state = NEW;
                             afficherImage(pseudo, 0, 0, 1);
-                            arreterMusiqueMenu(&son);
-                            jouerMusiqueJeu(&son);
+                            arreterMusiqueMenu(son);
+                            jouerMusiqueJeu(son);
                             break;
                         }
                         case 1:{
                             state = CHARGE;
                             afficherImage(mrbeast, 0, 0, 1);
-                            arreterMusiqueMenu(&son);
-                            jouerMusiqueJeu(&son);
+                            arreterMusiqueMenu(son);
+                            jouerMusiqueJeu(son);
                             break;
                         }
                         case 2:{
                             state = OPT;
                             afficherImage(mrbeast, 0, 0, 1);
-                            arreterMusiqueMenu(&son);
                             break;
                         }
                         case 3:{
                             state = QUIT;
                             afficherImage(confirm, 0, 0, 1);
-                            arreterMusiqueMenu(&son);
                             break;
                         }
                     }
@@ -120,8 +117,8 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                 state = MENUPRINCIPAL;
                 afficherImage(menu, 0, 0, 1);
                 afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
-                arreterMusiqueJeu(&son);
-                jouerMusiqueMenu(&son);
+                arreterMusiqueJeu(son);
+                jouerMusiqueMenu(son);
             }
             break;
         }

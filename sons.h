@@ -13,17 +13,17 @@
 #include <allegro5/allegro_acodec.h>
 
 
-ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueMenu;
-ALLEGRO_SAMPLE_INSTANCE *instanceMusiquejeu;
 
 typedef struct{
     ALLEGRO_SAMPLE *musiqueMenu;
     ALLEGRO_SAMPLE *musiqueJeu;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueMenu;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueJeu;
+    ALLEGRO_MIXER *mixer;
 }Sons;
 
-int initialiserRessourcesAudio(Sons *son);
+
+void initialiserRessourcesAudio(Sons *son);
 
 void arreterMusiqueMenu(Sons *son);
 
@@ -32,4 +32,6 @@ void jouerMusiqueMenu(Sons *son);
 void arreterMusiqueJeu(Sons *son);
 
 void jouerMusiqueJeu(Sons *son);
+
+
 #endif

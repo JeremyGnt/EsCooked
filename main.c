@@ -26,13 +26,14 @@ int main() {
     // Initialisations / Installations
     srand(time(NULL));
     assert(al_init());
-    assert(al_install_keyboard());
     assert(al_init_primitives_addon());
     assert(al_init_image_addon());
+    assert(al_install_keyboard());
+    al_init_font_addon();
+    assert(al_init_ttf_addon());
+    assert(al_install_mouse());
     assert(al_install_audio());
     assert(al_init_acodec_addon());
-    al_init_font_addon();
-    al_init_ttf_addon();
 
 
     // Déclarations
@@ -123,6 +124,7 @@ int main() {
     }
 
     initialiserRessourcesAudio(&son);
+    jouerMusiqueMenu(&son);
 
 
     // Boucle d'événements
@@ -139,7 +141,7 @@ int main() {
             case ALLEGRO_EVENT_KEY_DOWN: {
                 if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == MENUPRINCIPAL){
                     state = menuf(&event, menu, fleche, pseudo, confirm,
-                                  mrbeast, state, son);
+                                  mrbeast, state, &son);
                     if(state == JEU){
                         jeu(&joueur1, &joueur2, resources);
                     }

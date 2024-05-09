@@ -3,25 +3,28 @@
 #include "general.h"
 #include "commandes.h"
 
-int initialiserRessourcesAudio(Sons *son){
+void initialiserRessourcesAudio(Sons *son){
 
     if (!al_reserve_samples(5)) {
         fprintf(stderr, "Failed to reserve samples!\n");
-        return -1;
     }
 
-    son->musiqueMenu = al_load_sample("../Sons/rainy-day-in-town-with-birds-singing-194011.mp3");
-    son->musiqueJeu = al_load_sample("../Sons/epic-music-loop-17027.mp3");
+    son->mixer = al_get_default_mixer();
+    son->musiqueMenu = al_load_sample("../Sons/walk-down-sesame-street-acoustic-gtr-loop-91bpm-143350.wav");
+    son->musiqueJeu = al_load_sample("../Sons/busy-restaurant-dining-room-ambience-128466.wav");
 
     son->instanceMusiqueMenu = al_create_sample_instance(son->musiqueMenu);
     al_set_sample_instance_playmode(son->instanceMusiqueMenu, ALLEGRO_PLAYMODE_LOOP);
-    al_set_sample_instance_gain(son->instanceMusiqueMenu,1);
+    al_set_sample_instance_gain(son->instanceMusiqueMenu,0.5);
+    al_attach_sample_instance_to_mixer(son->instanceMusiqueMenu, son->mixer);
 
     son->instanceMusiqueJeu = al_create_sample_instance(son->musiqueJeu);
     al_set_sample_instance_playmode(son->instanceMusiqueJeu, ALLEGRO_PLAYMODE_LOOP);
-    al_set_sample_instance_gain(son->instanceMusiqueJeu,1);
+    al_set_sample_instance_gain(son->instanceMusiqueJeu,0.5);
+    al_attach_sample_instance_to_mixer(son->instanceMusiqueJeu, son->mixer);
 
 }
+
 
 void jouerMusiqueMenu(Sons *son){
     if(son->instanceMusiqueMenu != NULL){
