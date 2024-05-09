@@ -24,7 +24,7 @@
 #define FREQUENCE_NOUVELLE_RECETTE 1200
 #define NOMBRE_IMAGES 9
 
-#define DUREE_PARTIE 120
+#define DUREE_PARTIE 90
 
 #define NOIR al_map_rgb(0,0,0)
 #define BLANC al_map_rgb(255,255,255)

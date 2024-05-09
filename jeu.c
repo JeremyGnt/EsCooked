@@ -163,54 +163,59 @@ void agir(Joueur *joueur, GameResources *resources, fichierTexteMap *map) {
 
 void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2) {
     float speed = 1.0;  // Vitesse de déplacement
+
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_Z:
-                joueur1->vy -= speed;
+                joueur1->vy = -speed;
                 break;
             case ALLEGRO_KEY_S:
-                joueur1->vy += speed;
+                joueur1->vy = speed;
                 break;
             case ALLEGRO_KEY_Q:
-                joueur1->vx -= speed;
+                joueur1->vx = -speed;
                 break;
             case ALLEGRO_KEY_D:
-                joueur1->vx += speed;
+                joueur1->vx = speed;
                 break;
             case ALLEGRO_KEY_UP:
-                joueur2->vy -= speed;
+                joueur2->vy = -speed;
                 break;
             case ALLEGRO_KEY_DOWN:
-                joueur2->vy += speed;
+                joueur2->vy = speed;
                 break;
             case ALLEGRO_KEY_LEFT:
-                joueur2->vx -= speed;
+                joueur2->vx = -speed;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                joueur2->vx += speed;
-                break;
-
-
+                joueur2->vx = speed;
                 break;
         }
     } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         switch (event.keyboard.keycode) {
-            // Reset vx, vy to 0 when keys are released
             case ALLEGRO_KEY_Z:
+                if (joueur1->vy < 0) joueur1->vy = 0;
+                break;
             case ALLEGRO_KEY_S:
-                joueur1->vy = 0;
+                if (joueur1->vy > 0) joueur1->vy = 0;
                 break;
             case ALLEGRO_KEY_Q:
+                if (joueur1->vx < 0) joueur1->vx = 0;
+                break;
             case ALLEGRO_KEY_D:
-                joueur1->vx = 0;
+                if (joueur1->vx > 0) joueur1->vx = 0;
                 break;
             case ALLEGRO_KEY_UP:
+                if (joueur2->vy < 0) joueur2->vy = 0;
+                break;
             case ALLEGRO_KEY_DOWN:
-                joueur2->vy = 0;
+                if (joueur2->vy > 0) joueur2->vy = 0;
                 break;
             case ALLEGRO_KEY_LEFT:
+                if (joueur2->vx < 0) joueur2->vx = 0;
+                break;
             case ALLEGRO_KEY_RIGHT:
-                joueur2->vx = 0;
+                if (joueur2->vx > 0) joueur2->vx = 0;
                 break;
         }
     }
