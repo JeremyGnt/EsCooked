@@ -107,14 +107,12 @@ int main() {
             .x = 424,
             .y = 361,
             .bitmap = al_load_bitmap("../images/perso 1.png"),
-            .vitesse = 1.5
     };
 
     Joueur joueur2 = {
             .x = 824,
             .y = 361,
             .bitmap = al_load_bitmap("../images/perso 2.png"),
-            .vitesse = 1.5
     };
 
     if (!joueur1.bitmap || !joueur2.bitmap) {
