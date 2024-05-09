@@ -162,119 +162,105 @@ void agir(Joueur *joueur, GameResources *resources, fichierTexteMap *map) {
 }
 
 void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2) {
+    float speed = 1.0;  // Vitesse de déplacement
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_Z:
-                joueur1->toucheEnfoncer[HAUT] = true;
+                joueur1->vy -= speed;
                 break;
             case ALLEGRO_KEY_S:
-                joueur1->toucheEnfoncer[BAS] = true;
+                joueur1->vy += speed;
                 break;
             case ALLEGRO_KEY_Q:
-                joueur1->toucheEnfoncer[GAUCHE] = true;
+                joueur1->vx -= speed;
                 break;
             case ALLEGRO_KEY_D:
-                joueur1->toucheEnfoncer[DROITE] = true;
-                break;
-            case ALLEGRO_KEY_SPACE:
-                joueur1->toucheEnfoncer[ESPACE] = true;
+                joueur1->vx += speed;
                 break;
             case ALLEGRO_KEY_UP:
-                joueur2->toucheEnfoncer[HAUT] = true;
+                joueur2->vy -= speed;
                 break;
             case ALLEGRO_KEY_DOWN:
-                joueur2->toucheEnfoncer[BAS] = true;
+                joueur2->vy += speed;
                 break;
             case ALLEGRO_KEY_LEFT:
-                joueur2->toucheEnfoncer[GAUCHE] = true;
+                joueur2->vx -= speed;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                joueur2->toucheEnfoncer[DROITE] = true;
+                joueur2->vx += speed;
+                break;
+
+
                 break;
         }
     } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         switch (event.keyboard.keycode) {
+            // Reset vx, vy to 0 when keys are released
             case ALLEGRO_KEY_Z:
-                joueur1->toucheEnfoncer[HAUT] = false;
-                break;
             case ALLEGRO_KEY_S:
-                joueur1->toucheEnfoncer[BAS] = false;
+                joueur1->vy = 0;
                 break;
             case ALLEGRO_KEY_Q:
-                joueur1->toucheEnfoncer[GAUCHE] = false;
-                break;
             case ALLEGRO_KEY_D:
-                joueur1->toucheEnfoncer[DROITE] = false;
+                joueur1->vx = 0;
                 break;
             case ALLEGRO_KEY_UP:
-                joueur2->toucheEnfoncer[HAUT] = false;
-                break;
             case ALLEGRO_KEY_DOWN:
-                joueur2->toucheEnfoncer[BAS] = false;
+                joueur2->vy = 0;
                 break;
             case ALLEGRO_KEY_LEFT:
-                joueur2->toucheEnfoncer[GAUCHE] = false;
-                break;
             case ALLEGRO_KEY_RIGHT:
-                joueur2->toucheEnfoncer[DROITE] = false;
+                joueur2->vx = 0;
                 break;
         }
     }
 }
 
-void update_player_position(Joueur *joueur, fichierTexteMap *map) {
-    // Réinitialiser l'indicateur de mouvement
-    bool isMoving = false;
-    int newX = joueur->x, newY = joueur->y;
+void update_players_position(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
+    Joueur* joueurs[2] = {joueur1, joueur2};
 
-    if (joueur->toucheEnfoncer[HAUT]) {
-        newY -= joueur->vitesse;
-        joueur->angle = 0; // Orienté vers le haut par défaut
-        isMoving = true;
-    }
-    if (joueur->toucheEnfoncer[BAS]) {
-        newY += joueur->vitesse + 1; // +1 pour que le joueur aille à la meme vitesse dans tous les sens
-        joueur->angle = M_PI; // 180 degrés pour aller vers le bas
-        isMoving = true;
-    }
-    if (joueur->toucheEnfoncer[GAUCHE]) {
-        newX -= joueur->vitesse;
-        if (!isMoving) {
-            joueur->angle = 3 * M_PI / 2; // 270 degrés pour aller à gauche
-        } else {
-            // Ajustement pour le mouvement diagonal
-            joueur->angle = (joueur->toucheEnfoncer[HAUT] ? 7 * M_PI / 4 : 5 * M_PI / 4);
+    for (int idx = 0; idx < 2; idx++) {
+        Joueur *joueur = joueurs[idx];
+        // Calcul de la nouvelle position prévue
+        float nextX = joueur->x + joueur->vx;
+        float nextY = joueur->y + joueur->vy;
+
+        // Mise à jour de l'angle du joueur en fonction du vecteur de déplacement
+        float angle = atan2(joueur->vy, joueur->vx);
+        if (joueur->vx != 0 || joueur->vy != 0) {
+            // Rotation de 90 degrés pour correspondre à l'orientation "haut" par défaut
+            joueur->angle = angle + M_PI / 2;
         }
-        isMoving = true;
-    }
-    if (joueur->toucheEnfoncer[DROITE]) {
-        newX += joueur->vitesse + 1; // +1 pour que le joueur aille à la meme vitesse dans tous les sens
-        if (!isMoving) {
-            joueur->angle = M_PI / 2; // 90 degrés pour aller à droite
-        } else {
-            // Ajustement pour le mouvement diagonal
-            joueur->angle = (joueur->toucheEnfoncer[HAUT] ? M_PI / 4 : 3 * M_PI / 4);
+
+        // Vérifier la collision avec l'autre joueur en utilisant les bords de la bitmap
+        Joueur *other = joueurs[1 - idx];
+        float buffer = al_get_bitmap_width(joueur->bitmap);  // Utilisez la largeur de la bitmap comme buffer de collision
+
+        // Calcul des rectangles englobants pour les collisions
+        if (fabs(nextX - other->x) < buffer && fabs(nextY - other->y) < buffer) {
+            continue; // Annuler le déplacement si collision
         }
-        isMoving = true;
-    }
 
-    // Calculer les coordonnées de la grille en tenant compte du décalage de la carte
-    int mapX = (newX - map->decalMapX) / TAILLE_CARRE;
-    int mapY = (newY - map->decalMapY) / TAILLE_CARRE;
+        // Vérification des collisions avec les limites de la carte
+        int mapX = (int)((nextX - map->decalMapX) / TAILLE_CARRE);
+        int mapY = (int)((nextY - map->decalMapY) / TAILLE_CARRE);
 
-    if (mapX >= 0 && mapX < NB_COLONNES && mapY >= 0 && mapY < NB_LIGNES) {
-        int tileType = map->map[mapX][mapY];
-        if (tileType == 1 || tileType == 3) {  // Les types de sol valides où le joueur peut se déplacer
-            joueur->x = newX;
-            joueur->y = newY;
+        if (mapX >= 0 && mapX < NB_COLONNES && mapY >= 0 && mapY < NB_LIGNES) {
+            int tileType = map->map[mapX][mapY];
+            if (tileType == 1 || tileType == 3) {  // Sol valide pour le déplacement
+                joueur->x = nextX;
+                joueur->y = nextY;
+            }
         }
     }
 
-    int bitmap_width = al_get_bitmap_width(joueur->bitmap);
-    int bitmap_height = al_get_bitmap_height(joueur->bitmap);
-
-    // Dessinez le bitmap avec rotation à l'angle approprié
-    al_draw_rotated_bitmap(joueur->bitmap, bitmap_width / 2, bitmap_height / 2, joueur->x, joueur->y, joueur->angle, 0);
+    for (int i = 0; i < 2; i++) {
+        Joueur *joueur = joueurs[i];
+        int bitmap_width = al_get_bitmap_width(joueur->bitmap);
+        int bitmap_height = al_get_bitmap_height(joueur->bitmap);
+        // Ajuster la position du pivot pour correspondre à l'orientation "haut"
+        al_draw_rotated_bitmap(joueur->bitmap, bitmap_width / 2, bitmap_height / 2, joueur->x, joueur->y, joueur->angle, 0);
+    }
 }
 
 GameResources *initGameResources() {
@@ -500,8 +486,7 @@ void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources) {
                 }
                 afficher_map(map, resources);
                 dessinerToutMaillons(&liste, &imagesCommandes);
-                update_player_position(joueur1, &map);
-                update_player_position(joueur2, &map);
+                update_players_position(joueur1,joueur2, &map);
                 agir(joueur1, resources, &map);
                 afficherTemps(resources);
                 al_flip_display();

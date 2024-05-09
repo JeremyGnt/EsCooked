@@ -11,14 +11,16 @@ typedef struct {
 } fichierTexteMap;
 
 typedef struct {
-    int x, y;                // Coordonnées du joueur
+    int x, y;// Coordonnées du joueur
+    float vx, vy;
     ALLEGRO_BITMAP *bitmap;  // Bitmap pour l'affichage du joueur
     char nom[50];            // Nom du joueur
     bool toucheEnfoncer[4];  // État des touches [HAUT, BAS, GAUCHE, DROITE]
     float vitesse;           // Vitesse de déplacement du joueur
     int holding;
     float angle;             // Angle de déplacement pour l'affichage orienté
-    bool ingredientPorte;    // Le joueur est en train de porté un ingrédient ou non
+    bool ingredientPorte;
+    // Le joueur est en train de porté un ingrédient ou non
 } Joueur;
 
 typedef struct {
@@ -54,7 +56,7 @@ typedef struct {
 enum {BAS, HAUT, GAUCHE, DROITE, ESPACE};
 
 void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2);
-void update_player_position(Joueur *joueur, fichierTexteMap *map);
+void update_players_position(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map);
 void afficher_map(fichierTexteMap map, GameResources *resources);
 void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources);
