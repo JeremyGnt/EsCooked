@@ -15,7 +15,7 @@ typedef struct {
     int x, y;
     ALLEGRO_BITMAP *bitmap;
     bool Tenir;
-    double transformStartTime; // Temps de début de la transformation
+    double tempsChargement; // Temps de début de la transformation
 } Ingredient;
 
 typedef struct {

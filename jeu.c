@@ -67,8 +67,8 @@ void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
 }
 
 void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, double tempsTransformation) {
-    if (ingredient->transformStartTime > 0 && tempsTransformation > 0) {
-        double tempsEcoule = tempsActuel - ingredient->transformStartTime;
+    if (ingredient->tempsChargement > 0 && tempsTransformation > 0) {
+        double tempsEcoule = tempsActuel - ingredient->tempsChargement;
         double proportion = tempsEcoule / tempsTransformation;
         if (proportion > 1.0) proportion = 1.0;
 
@@ -82,7 +82,7 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
 
         ALLEGRO_COLOR couleurJauge;
         if (proportion < 0.5) {
-            // De vert à orange
+
             float vert = 1.0;
             float rouge = proportion * 2.0;
             couleurJauge = al_map_rgb_f(rouge, vert, 0.0);
@@ -149,12 +149,12 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
             }
 
             if (nouveauBitmap) {
-                if (ingredient->transformStartTime == 0) {
-                    ingredient->transformStartTime = tempsActuel;
+                if (ingredient->tempsChargement == 0) {
+                    ingredient->tempsChargement = tempsActuel;
                 }
-                if (tempsActuel - ingredient->transformStartTime >= tempsTransformation) {
+                if (tempsActuel - ingredient->tempsChargement >= tempsTransformation) {
                     ingredient->bitmap = nouveauBitmap;
-                    ingredient->transformStartTime = 0; // Reset time after transformation
+                    ingredient->tempsChargement = 0;
                 } else if (iconeTransformation) {
                     al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
                     dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
@@ -169,7 +169,7 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
     double tempsActuel = al_get_time();
     for (int i = 0; i < ressources->ItemLaches.compte; i++) {
         Ingredient *ingredient = ressources->ItemLaches.items[i];
-        if (ingredient && ingredient->transformStartTime > 0) {
+        if (ingredient && ingredient->tempsChargement > 0) {
             double tempsTransformation = 0;
             ALLEGRO_BITMAP *nouveauBitmap = NULL;
             ALLEGRO_BITMAP *iconeTransformation = NULL;
@@ -193,9 +193,9 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
             }
 
             if (nouveauBitmap) {
-                if (tempsActuel - ingredient->transformStartTime >= tempsTransformation) {
+                if (tempsActuel - ingredient->tempsChargement >= tempsTransformation) {
                     ingredient->bitmap = nouveauBitmap;
-                    ingredient->transformStartTime = 0;
+                    ingredient->tempsChargement = 0;
                 } else if (iconeTransformation) {
                     al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
                     dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
@@ -213,7 +213,7 @@ Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y) {
         ingredient->y = y;
         ingredient->bitmap = bitmap;
         ingredient->Tenir = false;
-        ingredient->transformStartTime = 0;
+        ingredient->tempsChargement = 0;
     }
     return ingredient;
 }

@@ -78,6 +78,7 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                             state = NEW;
                             afficherImage(pseudo, 0, 0, 1);
                             arreterMusiqueMenu(son);
+                            jouerSonAccepter(son);
                             jouerMusiqueJeu(son);
                             break;
                         }
@@ -85,17 +86,19 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                             state = CHARGE;
                             afficherImage(mrbeast, 0, 0, 1);
                             arreterMusiqueMenu(son);
-                            jouerMusiqueJeu(son);
+                            jouerSonAccepter(son);
                             break;
                         }
                         case 2:{
                             state = OPT;
                             afficherImage(mrbeast, 0, 0, 1);
+                            jouerSonAccepter(son);
                             break;
                         }
                         case 3:{
                             state = QUIT;
                             afficherImage(confirm, 0, 0, 1);
+                            jouerSonAccepter(son);
                             break;
                         }
                     }
@@ -118,6 +121,7 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                 afficherImage(menu, 0, 0, 1);
                 afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
                 arreterMusiqueJeu(son);
+                jouerSonRetour(son);
                 jouerMusiqueMenu(son);
             }
             break;

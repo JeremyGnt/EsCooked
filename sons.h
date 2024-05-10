@@ -39,11 +39,8 @@ void jouerMusiqueJeu(Sons *son);
 
 void jouerSonAccepter(Sons *son);
 
-void arreterSonAccepter(Sons *son);
-
 void jouerSonRetour(Sons *son);
 
-void arreterSonRetour(Sons *son);
 
 
 #endif

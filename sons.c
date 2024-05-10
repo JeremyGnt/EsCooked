@@ -26,12 +26,12 @@ void initialiserRessourcesAudio(Sons *son){
     al_attach_sample_instance_to_mixer(son->instanceMusiqueJeu, son->mixer);
 
     son->instanceSonAccepter = al_create_sample_instance(son->sonAccepter);
-    al_set_sample_instance_playmode(son->instanceSonAccepter, ALLEGRO_PLAYMODE_LOOP);
+    al_set_sample_instance_playmode(son->instanceSonAccepter, ALLEGRO_PLAYMODE_ONCE);
     al_set_sample_instance_gain(son->instanceSonAccepter,0.5);
     al_attach_sample_instance_to_mixer(son->instanceSonAccepter, son->mixer);
 
     son->instanceSonRetour = al_create_sample_instance(son->sonRetour);
-    al_set_sample_instance_playmode(son->instanceSonRetour, ALLEGRO_PLAYMODE_LOOP);
+    al_set_sample_instance_playmode(son->instanceSonRetour, ALLEGRO_PLAYMODE_ONCE);
     al_set_sample_instance_gain(son->instanceSonRetour,0.5);
     al_attach_sample_instance_to_mixer(son->instanceSonRetour, son->mixer);
 
@@ -68,21 +68,11 @@ void jouerSonAccepter(Sons *son){
     }
 }
 
-void arreterSonAccepter(Sons *son){
-    if(son->instanceSonAccepter != NULL){
-        al_stop_sample_instance((son->instanceSonAccepter));
-    }
-}
-
 void jouerSonRetour(Sons *son){
     if(son->instanceSonRetour != NULL){
         al_play_sample_instance((son->instanceSonRetour));
     }
 }
 
-void arreterSonRetour(Sons *son){
-    if(son->instanceSonRetour != NULL){
-        al_stop_sample_instance((son->instanceSonRetour));
-    }
-}
+
 
