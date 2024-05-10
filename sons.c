@@ -14,6 +14,7 @@ void initialiserRessourcesAudio(Sons *son){
     son->musiqueJeu = al_load_sample("../Sons/busy-restaurant-dining-room-ambience-128466.wav");
     son->sonAccepter = al_load_sample("../Sons/interface-12-204786.wav");
     son->sonRetour = al_load_sample("../Sons/interface-10-204783.wav");
+    son->sonCuisson = al_load_sample("../Sons/food-cooking-in-oil-178795.wav");
 
     son->instanceMusiqueMenu = al_create_sample_instance(son->musiqueMenu);
     al_set_sample_instance_playmode(son->instanceMusiqueMenu, ALLEGRO_PLAYMODE_LOOP);
@@ -34,6 +35,11 @@ void initialiserRessourcesAudio(Sons *son){
     al_set_sample_instance_playmode(son->instanceSonRetour, ALLEGRO_PLAYMODE_ONCE);
     al_set_sample_instance_gain(son->instanceSonRetour,0.5);
     al_attach_sample_instance_to_mixer(son->instanceSonRetour, son->mixer);
+
+    son->instanceSonCuisson = al_create_sample_instance(son->sonCuisson);
+    al_set_sample_instance_playmode(son->instanceSonCuisson, ALLEGRO_PLAYMODE_ONCE);
+    al_set_sample_instance_gain(son->instanceSonCuisson,0.3);
+    al_attach_sample_instance_to_mixer(son->instanceSonCuisson, son->mixer);
 
 }
 
@@ -71,6 +77,18 @@ void jouerSonAccepter(Sons *son){
 void jouerSonRetour(Sons *son){
     if(son->instanceSonRetour != NULL){
         al_play_sample_instance((son->instanceSonRetour));
+    }
+}
+
+void jouerSonCuisson(Sons *son){
+    if(son->instanceSonCuisson != NULL){
+        al_play_sample_instance((son->instanceSonCuisson));
+    }
+}
+
+void arreterSonCuisson(Sons *son){
+    if(son->instanceSonCuisson != NULL){
+        al_stop_sample_instance((son->instanceSonCuisson));
     }
 }
 

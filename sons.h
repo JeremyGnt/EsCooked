@@ -19,10 +19,12 @@ typedef struct{
     ALLEGRO_SAMPLE *musiqueJeu;
     ALLEGRO_SAMPLE *sonAccepter;
     ALLEGRO_SAMPLE *sonRetour;
+    ALLEGRO_SAMPLE *sonCuisson;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueMenu;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueJeu;
     ALLEGRO_SAMPLE_INSTANCE *instanceSonAccepter;
     ALLEGRO_SAMPLE_INSTANCE *instanceSonRetour;
+    ALLEGRO_SAMPLE_INSTANCE *instanceSonCuisson;
     ALLEGRO_MIXER *mixer;
 }Sons;
 
@@ -40,6 +42,10 @@ void jouerMusiqueJeu(Sons *son);
 void jouerSonAccepter(Sons *son);
 
 void jouerSonRetour(Sons *son);
+
+void jouerSonCuisson(Sons *son);
+
+void arreterSonCuisson(Sons *son);
 
 
 

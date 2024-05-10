@@ -1,6 +1,7 @@
 #include "jeu.h"
 #include "general.h"
 #include "commandes.h"
+#include "sons.h"
 
 int ingredientSuivant = 1;
 
@@ -25,10 +26,11 @@ void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
 }
 
 void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
+    int k,j;
     if (ressources->fond) {
         al_draw_bitmap(ressources->fond, 0, 0, 0);
     }
-    for (int j = 0; j < NB_LIGNES; j++) {
+    for (j = 0; j < NB_LIGNES; j++) {
         for (int i = 0; i < NB_COLONNES; i++) {
             ALLEGRO_BITMAP *bitmap = NULL;
             switch (map.map[i][j]) {
@@ -58,7 +60,7 @@ void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
         }
     }
 
-    for (int k = 0; k < ressources->ItemLaches.compte; k++) {
+    for (k = 0; k < ressources->ItemLaches.compte; k++) {
         Ingredient *item = ressources->ItemLaches.items[k];
         if (item && item->bitmap) {
             al_draw_bitmap(item->bitmap, item->x, item->y, 0);
@@ -98,12 +100,14 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
 }
 
 void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
+    int d,i;
+    Sons son;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
     double tempsActuel = al_get_time();
 
-    for (int d = 0; d < 4; d++) {
+    for (d = 0; d < 4; d++) {
         int adjX = mapX + directions[d][0];
         int adjY = mapY + directions[d][1];
         if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue;
@@ -115,7 +119,7 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
         if (!directionRegard) continue;
 
         Ingredient *ingredient = NULL;
-        for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+        for (i = 0; i < ressources->ItemLaches.compte; i++) {
             Ingredient *lache = ressources->ItemLaches.items[i];
             if (lache && lache->x == adjX * TAILLE_CARRE + map->decalMapX && lache->y == adjY * TAILLE_CARRE + map->decalMapY) {
                 ingredient = lache;
@@ -166,8 +170,9 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
 }
 
 void mettreAJourTransformation(RessourcesJeu *ressources) {
+    int i;
     double tempsActuel = al_get_time();
-    for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+    for (i = 0; i < ressources->ItemLaches.compte; i++) {
         Ingredient *ingredient = ressources->ItemLaches.items[i];
         if (ingredient && ingredient->tempsChargement > 0) {
             double tempsTransformation = 0;
@@ -239,11 +244,12 @@ void enleveItemLache(ItemLache *itemsLache, Ingredient *ingredient) {
 }
 
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
+    int d,i;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
 
-    for (int d = 0; d < 4; d++) {
+    for (d = 0; d < 4; d++) {
         int adjX = mapX + directions[d][0];
         int adjY = mapY + directions[d][1];
         if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue;
@@ -288,7 +294,7 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
             } else {
                 Ingredient *ingredientPlusProche = NULL;
                 int distanceMinimale = INT_MAX;
-                for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+                for (i = 0; i < ressources->ItemLaches.compte; i++) {
                     Ingredient *lache = ressources->ItemLaches.items[i];
                     if (lache && lache->x == adjX * TAILLE_CARRE + map->decalMapX && lache->y == adjY * TAILLE_CARRE + map->decalMapY) {
                         int distance = abs(lache->x - (adjX * TAILLE_CARRE + map->decalMapX)) +

@@ -2,6 +2,7 @@
 #define ESCOOKED_JEU_H
 
 #include "general.h"
+#include "sons.h"
 
 typedef struct {
     int map[NB_COLONNES][NB_LIGNES];
@@ -91,6 +92,7 @@ void detruireRessourcesJeu(RessourcesJeu *ressources);
 void destroyJoueur(Joueur *joueur);
 void afficherTemps(RessourcesJeu *ressources);
 void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
+void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
 
 
 
