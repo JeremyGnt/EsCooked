@@ -475,7 +475,7 @@ RessourcesJeu *initRessourcesJeu() {
 
     al_init_font_addon();
     al_init_ttf_addon();
-    ressources->font = al_load_ttf_font("../font/Jersey25-Regular.ttf", 36, 0);
+    ressources->font = al_load_ttf_font("../PNGS/fonts/Jersey25-Regular.ttf", 36, 0);
 
     for (int i = 0; i < 10; i++) {
         ressources->ItemLaches.items[i] = NULL;
