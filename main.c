@@ -57,6 +57,14 @@ int main() {
     ALLEGRO_BITMAP *pseudo = NULL;
     ALLEGRO_BITMAP *confirm = NULL;
 
+    ALLEGRO_BITMAP *Fleche = NULL;
+    ALLEGRO_BITMAP *boxesM = NULL;
+    ALLEGRO_BITMAP *fond = NULL;
+    ALLEGRO_BITMAP *perso1 = NULL;
+    ALLEGRO_BITMAP *perso2 = NULL;
+    ALLEGRO_BITMAP *pseudoM = NULL;
+    ALLEGRO_BITMAP *confirM = NULL;
+
     //icone
     ALLEGRO_BITMAP *icone = NULL;
     icone = al_load_bitmap("..\\PNGS\\temp\\icone.png");
@@ -88,6 +96,21 @@ int main() {
     confirm = al_load_bitmap("..\\PNGS\\temp\\confirmation.png");
     assert(confirm != NULL);
 
+    Fleche = al_load_bitmap("..\\PNGS\\ImagesMenu\\fleche.png");
+    assert(Fleche != NULL);
+    boxesM = al_load_bitmap("..\\PNGS\\ImagesMenu\\MenuBoxes.png");
+    assert(boxesM != NULL);
+    fond = al_load_bitmap("..\\PNGS\\ImagesMenu\\MenuFond.png");
+    assert(fond != NULL);
+    perso1 = al_load_bitmap("..\\PNGS\\ImagesMenu\\Perso1.png");
+    assert(perso1 != NULL);
+    perso2 = al_load_bitmap("..\\PNGS\\ImagesMenu\\Perso2.png");
+    assert(perso2 != NULL);
+    pseudoM = al_load_bitmap("..\\PNGS\\ImagesMenu\\MenuPseudo.png");
+    assert(pseudoM != NULL);
+    confirM = al_load_bitmap("..\\PNGS\\ImagesMenu\\QuitterConfirmation.png");
+    assert(confirM != NULL);
+
 
     //init
     const char *charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
@@ -96,11 +119,12 @@ int main() {
 
 
     enum {
-        MENUPRINCIPAL, NEW, CHARGE, OPT, QUIT, JEU, OFF
+        MENUPRINCIPAL, NEW, GUIDE, OPT, QUIT, JEU, OFF
     };
     int state = MENUPRINCIPAL;
 
     declarationMenu(fleche, menu);
+    transitionmenu(Fleche, fond, perso1, boxesM);
 
 
     Joueur joueur1 = {
@@ -137,9 +161,9 @@ int main() {
 
 
             case ALLEGRO_EVENT_KEY_DOWN: {
-                if(state == QUIT || state == OPT || state == CHARGE || state == NEW || state == MENUPRINCIPAL){
-                    state = menuf(&event, menu, fleche, pseudo, confirm,
-                                  mrbeast, state, &son);
+                if(state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL){
+                    state = menuf(&event, fond, Fleche, perso1, perso2,
+                                      boxesM, pseudoM, confirM, state, &son);
                     if(state == JEU){
                         jeu(&joueur1, &joueur2, ressources);
                     }

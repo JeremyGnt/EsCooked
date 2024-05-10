@@ -18,10 +18,11 @@ void afficherImage(ALLEGRO_BITMAP* buh, int x, int y, int R) {
     al_draw_bitmap(buh, x, y, 0);
 }
 
+
 void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu){
 
-    sub game = createSub(absc * 9, ord * 10, CHARGEGAME);
-    sub newgame = createSub(absc * 9, ord * 16, NEWGAME);
+    sub game = createSub(absc * 9, ord * 10, NEWGAME);
+    sub newgame = createSub(absc * 9, ord * 16, GUIDE);
     sub options = createSub(absc * 9, ord * 22, OPTIONS);
     sub exit = createSub(absc * 9, ord * 28, EXIT);
 
@@ -30,17 +31,33 @@ void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu){
     Menu[2] = options;
     Menu[3] = exit;
 
-    afficherImage(menu, 0, 0, 1);
-    afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+    //afficherImage(menu, 0, 0, 1);
+    //afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
 }
 
-int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm,
-          ALLEGRO_BITMAP* mrbeast, int state,Sons *son){
+
+void transitionmenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* perso, ALLEGRO_BITMAP* boxes){
+    for(int i = 200; i >= 0; i = i- 10){
+        afficherImage(fond, 0, 0, 0);
+        afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+        afficherImage(perso, i, 0, 0);
+    }
+    afficherImage(boxes, 0, 0, 0);
+}
+
+void baseMenu( ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* perso, ALLEGRO_BITMAP* boxes){
+    afficherImage(fond, 0, 0, 0);
+    afficherImage(perso, 0, 0, 0);
+    afficherImage(boxes, 0, 0, 0);
+}
+
+int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* perso1, ALLEGRO_BITMAP* perso2,
+          ALLEGRO_BITMAP* boxes, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm, int state,Sons *son){
     switch(event->keyboard.keycode){
         case ALLEGRO_KEY_DOWN :{
             switch(state){
                 case MENUPRINCIPAL:{
-                    afficherImage(menu, 0, 0, 1);
+                    baseMenu(fond, perso1, boxes);
                     if(pos!=3){
                         afficherImage(fleche, Menu[pos+1].posX, Menu[pos+1].posY, 0);
                         pos = pos+1;
@@ -56,7 +73,7 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
         case ALLEGRO_KEY_UP :{
             switch(state){
                 case MENUPRINCIPAL:{
-                    afficherImage(menu, 0, 0, 1);
+                    baseMenu(fond, perso1, boxes);
                     if(pos!=0){
                         afficherImage(fleche, Menu[pos-1].posX, Menu[pos-1].posY, 0);
                         pos = pos-1;
@@ -76,28 +93,32 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
                     switch(pos){
                         case 0:{
                             state = NEW;
-                            afficherImage(pseudo, 0, 0, 1);
+                            afficherImage(fond, 0, 0, 0);
+                            afficherImage(pseudo, 0, 0, 0);
                             arreterMusiqueMenu(son);
                             jouerSonAccepter(son);
                             jouerMusiqueJeu(son);
                             break;
                         }
                         case 1:{
-                            state = CHARGE;
-                            afficherImage(mrbeast, 0, 0, 1);
+                            state = GUIDEMENU;
+                            afficherImage(fond, 0, 0, 0);
+                            afficherImage(perso2, 0, 0, 0);
                             arreterMusiqueMenu(son);
                             jouerSonAccepter(son);
                             break;
                         }
                         case 2:{
                             state = OPT;
-                            afficherImage(mrbeast, 0, 0, 1);
+                            afficherImage(fond, 0, 0, 0);
                             jouerSonAccepter(son);
                             break;
                         }
                         case 3:{
                             state = QUIT;
-                            afficherImage(confirm, 0, 0, 1);
+                            afficherImage(fond, 0, 0, 0);
+                            afficherImage(perso1, 0, 0, 0);
+                            afficherImage(confirm, 0, 0, 0);
                             jouerSonAccepter(son);
                             break;
                         }
@@ -116,10 +137,9 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* menu, ALLEGRO_BITMAP* fleche, AL
             break;
         }
         case ALLEGRO_KEY_ESCAPE:{
-            if(state == QUIT || state == OPT || state == CHARGE || state == NEW){
+            if(state == QUIT || state == OPT || state == GUIDEMENU || state == NEW){
                 state = MENUPRINCIPAL;
-                afficherImage(menu, 0, 0, 1);
-                afficherImage(fleche, Menu[pos].posX, Menu[pos].posY, 0);
+                transitionmenu(fleche, fond, perso1, boxes);
                 arreterMusiqueJeu(son);
                 jouerSonRetour(son);
                 jouerMusiqueMenu(son);
