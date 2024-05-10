@@ -17,8 +17,12 @@
 typedef struct{
     ALLEGRO_SAMPLE *musiqueMenu;
     ALLEGRO_SAMPLE *musiqueJeu;
+    ALLEGRO_SAMPLE *sonAccepter;
+    ALLEGRO_SAMPLE *sonRetour;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueMenu;
     ALLEGRO_SAMPLE_INSTANCE *instanceMusiqueJeu;
+    ALLEGRO_SAMPLE_INSTANCE *instanceSonAccepter;
+    ALLEGRO_SAMPLE_INSTANCE *instanceSonRetour;
     ALLEGRO_MIXER *mixer;
 }Sons;
 
@@ -32,6 +36,14 @@ void jouerMusiqueMenu(Sons *son);
 void arreterMusiqueJeu(Sons *son);
 
 void jouerMusiqueJeu(Sons *son);
+
+void jouerSonAccepter(Sons *son);
+
+void arreterSonAccepter(Sons *son);
+
+void jouerSonRetour(Sons *son);
+
+void arreterSonRetour(Sons *son);
 
 
 #endif
