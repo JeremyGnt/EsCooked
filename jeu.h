@@ -11,17 +11,28 @@ typedef struct {
 } fichierTexteMap;
 
 typedef struct {
-    int x, y;// Coordonnées du joueur
+    int id;
+    int x, y;
+    ALLEGRO_BITMAP *bitmap;
+    bool Tenir;
+    double transformStartTime; // Temps de début de la transformation
+} Ingredient;
+
+typedef struct {
+    Ingredient *items[10];
+    int compte;
+} ItemLache;
+
+
+typedef struct {
+    int x, y;
+    ALLEGRO_BITMAP *bitmap;
+    char nom[50];
+    float angle;
     float vx, vy;
-    ALLEGRO_BITMAP *bitmap;  // Bitmap pour l'affichage du joueur
-    char nom[50];            // Nom du joueur
-    bool toucheEnfoncer[4];  // État des touches [HAUT, BAS, GAUCHE, DROITE]
-    float vitesse;           // Vitesse de déplacement du joueur
-    int holding;
-    float angle;             // Angle de déplacement pour l'affichage orienté
-    bool ingredientPorte;
-    // Le joueur est en train de porté un ingrédient ou non
+    Ingredient *ingredient;
 } Joueur;
+
 
 typedef struct {
     ALLEGRO_DISPLAY *display;
@@ -47,25 +58,40 @@ typedef struct {
     ALLEGRO_BITMAP *presseAgrume;
     ALLEGRO_BITMAP *fond;
     ALLEGRO_BITMAP *macaronTemps;
-} GameResources;
 
-typedef struct {
-    int x, y;
-} Ingredients;
+    ALLEGRO_BITMAP *limonade;
+    ALLEGRO_BITMAP *canneasucreBrut;
+    ALLEGRO_BITMAP *citronBrut;
+    ALLEGRO_BITMAP *mentheBrut;
 
-enum {BAS, HAUT, GAUCHE, DROITE, ESPACE};
+    ALLEGRO_BITMAP *citronDecoupe;
+    ALLEGRO_BITMAP *mentheDecoupe;
+    ALLEGRO_BITMAP *alcoolCuit;
+    ALLEGRO_BITMAP *citronPresse;
 
-void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2);
-void update_players_position(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
+    ALLEGRO_BITMAP *iconeCuisson;
+    ALLEGRO_BITMAP *iconeDecoupe;
+    ALLEGRO_BITMAP *iconePresse;
+
+    ItemLache ItemLaches;
+
+
+} RessourcesJeu;
+
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map);
-void afficher_map(fichierTexteMap map, GameResources *resources);
-void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources);
-void agir(Joueur *joueur1, GameResources *resources, fichierTexteMap *map);
-
-GameResources* initGameResources();
-void destroyGameResources(GameResources *resources);
+void afficher_map(fichierTexteMap map, RessourcesJeu *ressources);
+Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y);
+void ajouterItemLache(ItemLache *itemsLache, Ingredient *ingredient);
+void enleveItemLache(ItemLache *itemsLache, Ingredient *ingredient);
+void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map);
+void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
+RessourcesJeu *initRessourcesJeu();
+void detruireRessourcesJeu(RessourcesJeu *ressources);
 void destroyJoueur(Joueur *joueur);
-void afficherTemps(GameResources *resources);
+void afficherTemps(RessourcesJeu *ressources);
+void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
+
 
 
 

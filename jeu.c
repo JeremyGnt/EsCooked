@@ -2,6 +2,7 @@
 #include "general.h"
 #include "commandes.h"
 
+int ingredientSuivant = 1;
 
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
     FILE *fichier = fopen(nomFichier, "r");
@@ -23,74 +24,44 @@ void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
     fclose(fichier);
 }
 
-void afficher_map(fichierTexteMap map, GameResources *resources) {
-    al_draw_bitmap(resources->fond, 0, 0, 0);
+void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
+    if (ressources->fond) {
+        al_draw_bitmap(ressources->fond, 0, 0, 0);
+    }
     for (int j = 0; j < NB_LIGNES; j++) {
         for (int i = 0; i < NB_COLONNES; i++) {
+            ALLEGRO_BITMAP *bitmap = NULL;
             switch (map.map[i][j]) {
-                case 2:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->plandetravail, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 1:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->sol1,
-                                   (i * TAILLE_CARRE) + map.decalMapX, (j * TAILLE_CARRE) + map.decalMapY,
-                                   0);
-                    break;
-                case 3:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->sol2,
-                                   (i * TAILLE_CARRE) + map.decalMapX, (j * TAILLE_CARRE) + map.decalMapY,
-                                   0);
-                    break;
-                case 30:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->frigomenthe,
-                                   (i * TAILLE_CARRE) + map.decalMapX, (j * TAILLE_CARRE) + map.decalMapY,
-                                   0);
-                    break;
-                case 31:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->frigocitron,
-                                   (i * TAILLE_CARRE) + map.decalMapX, (j * TAILLE_CARRE) + map.decalMapY,
-                                   0);
-                    break;
-                case 32:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->frigolimonade,
-                                   (i * TAILLE_CARRE) + map.decalMapX, (j * TAILLE_CARRE) + map.decalMapY,
-                                   0);
-                    break;
-                case 33:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->frigocanneasucre,
-                                   (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 5:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->cuisson, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 6:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->poubelle, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 7:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->sortie, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 8:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->presseAgrume, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
-                case 9:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->decoupe, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    break;
+                case 1: bitmap = ressources->sol1; break;
+                case 2: bitmap = ressources->plandetravail; break;
+                case 3: bitmap = ressources->sol2; break;
+                case 5: bitmap = ressources->cuisson; break;
+                case 6: bitmap = ressources->poubelle; break;
+                case 7: bitmap = ressources->sortie; break;
+                case 8: bitmap = ressources->presseAgrume; break;
+                case 9: bitmap = ressources->decoupe; break;
                 case 10:
-                    al_draw_bitmap(map.mapImages[i][j] = resources->frigo, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
-                    al_draw_bitmap(map.mapImages[i][j] = resources->verre, (i * TAILLE_CARRE) + map.decalMapX,
-                                   (j * TAILLE_CARRE) + map.decalMapY, 0);
+                    if (ressources->frigo) {
+                        al_draw_bitmap(ressources->frigo, i * TAILLE_CARRE + map.decalMapX, j * TAILLE_CARRE + map.decalMapY, 0);
+                    }
+                    bitmap = ressources->verre;
                     break;
-                default:
-                    break;
+                case 30: bitmap = ressources->frigomenthe; break;
+                case 31: bitmap = ressources->frigocitron; break;
+                case 32: bitmap = ressources->frigolimonade; break;
+                case 33: bitmap = ressources->frigocanneasucre; break;
             }
+            if (bitmap) {
+                al_draw_bitmap(bitmap, i * TAILLE_CARRE + map.decalMapX, j * TAILLE_CARRE + map.decalMapY, 0);
+                map.mapImages[i][j] = bitmap;
+            }
+        }
+    }
+
+    for (int k = 0; k < ressources->ItemLaches.compte; k++) {
+        Ingredient *item = ressources->ItemLaches.items[k];
+        if (item && item->bitmap) {
+            al_draw_bitmap(item->bitmap, item->x, item->y, 0);
         }
     }
 }
@@ -339,34 +310,47 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
         }
     }
 }
-void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2) {
-    float speed = 1.0;
+
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map) {
+    float vitesse = 1.0;
 
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_Z:
-                joueur1->vy = -speed;
+                joueur1->vy = -vitesse;
                 break;
             case ALLEGRO_KEY_S:
-                joueur1->vy = speed;
+                joueur1->vy = vitesse;
                 break;
             case ALLEGRO_KEY_Q:
-                joueur1->vx = -speed;
+                joueur1->vx = -vitesse;
                 break;
             case ALLEGRO_KEY_D:
-                joueur1->vx = speed;
+                joueur1->vx = vitesse;
                 break;
             case ALLEGRO_KEY_UP:
-                joueur2->vy = -speed;
+                joueur2->vy = -vitesse;
                 break;
             case ALLEGRO_KEY_DOWN:
-                joueur2->vy = speed;
+                joueur2->vy = vitesse;
                 break;
             case ALLEGRO_KEY_LEFT:
-                joueur2->vx = -speed;
+                joueur2->vx = -vitesse;
                 break;
             case ALLEGRO_KEY_RIGHT:
-                joueur2->vx = speed;
+                joueur2->vx = vitesse;
+                break;
+            case ALLEGRO_KEY_C:
+                agir(joueur1, resources, map);
+                break;
+            case ALLEGRO_KEY_L:
+                agir(joueur2, resources, map);
+                break;
+            case ALLEGRO_KEY_V:
+                transformerIngredient(joueur1, resources, map);
+                break;
+            case ALLEGRO_KEY_M:
+                transformerIngredient(joueur2, resources, map);
                 break;
         }
     } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -399,50 +383,50 @@ void handle_keyboard_events(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
     }
 }
 
-void update_players_position(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
-    Joueur* joueurs[2] = {joueur1, joueur2};
+void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
+    Joueur *joueurs[2] = {joueur1, joueur2};
 
     for (int idx = 0; idx < 2; idx++) {
         Joueur *joueur = joueurs[idx];
-
         float nextX = joueur->x + joueur->vx;
         float nextY = joueur->y + joueur->vy;
 
-
-        float angle = atan2(joueur->vy, joueur->vx);
         if (joueur->vx != 0 || joueur->vy != 0) {
-            
-            joueur->angle = angle + M_PI / 2;
+            joueur->angle = atan2(joueur->vy, joueur->vx) + M_PI / 2;
         }
 
-        // Vérifier la collision avec l'autre joueur en utilisant les bords de la bitmap
-        Joueur *other = joueurs[1 - idx];
-        float buffer = al_get_bitmap_width(joueur->bitmap);  // Utilisez la largeur de la bitmap comme buffer de collision
+        Joueur *autre = joueurs[1 - idx];
+        float buffer = joueur->bitmap ? al_get_bitmap_width(joueur->bitmap) : 0;
 
-        // Calcul des rectangles englobants pour les collisions
-        if (fabs(nextX - other->x) < buffer && fabs(nextY - other->y) < buffer) {
-            continue; // Annuler le déplacement si collision
-        }
+        if (fabs(nextX - autre->x) < buffer && fabs(nextY - autre->y) < buffer) continue;
 
-        // Vérification des collisions avec les limites de la carte
         int mapX = (int)((nextX - map->decalMapX) / TAILLE_CARRE);
         int mapY = (int)((nextY - map->decalMapY) / TAILLE_CARRE);
 
         if (mapX >= 0 && mapX < NB_COLONNES && mapY >= 0 && mapY < NB_LIGNES) {
-            int tileType = map->map[mapX][mapY];
-            if (tileType == 1 || tileType == 3) {  // Sol valide pour le déplacement
+            int typeDeCase = map->map[mapX][mapY];
+            if (typeDeCase == 1 || typeDeCase == 3) {
                 joueur->x = nextX;
                 joueur->y = nextY;
             }
+        }
+
+        if (joueur->ingredient && joueur->ingredient->Tenir) {
+            joueur->ingredient->x = joueur->x;
+            joueur->ingredient->y = joueur->y;
         }
     }
 
     for (int i = 0; i < 2; i++) {
         Joueur *joueur = joueurs[i];
-        int bitmap_width = al_get_bitmap_width(joueur->bitmap);
-        int bitmap_height = al_get_bitmap_height(joueur->bitmap);
-        // Ajuster la position du pivot pour correspondre à l'orientation "haut"
-        al_draw_rotated_bitmap(joueur->bitmap, bitmap_width / 2, bitmap_height / 2, joueur->x, joueur->y, joueur->angle, 0);
+        if (joueur->bitmap) {
+            al_draw_rotated_bitmap(joueur->bitmap, al_get_bitmap_width(joueur->bitmap) / 2,
+                                   al_get_bitmap_height(joueur->bitmap) / 2, joueur->x, joueur->y, joueur->angle, 0);
+        }
+
+        if (joueur->ingredient && joueur->ingredient->Tenir) {
+            al_draw_bitmap(joueur->ingredient->bitmap, joueur->ingredient->x, joueur->ingredient->y, 0);
+        }
     }
 }
 
@@ -501,48 +485,50 @@ RessourcesJeu *initRessourcesJeu() {
     return ressources;
 }
 
-void destroyGameResources(GameResources *resources) {
-    if (resources) {
-        al_destroy_bitmap(resources->sol1);
-        al_destroy_bitmap(resources->sol2);
-        al_destroy_bitmap(resources->plandetravail);
-        al_destroy_bitmap(resources->frigomenthe);
-        al_destroy_bitmap(resources->frigocitron);
-        al_destroy_bitmap(resources->frigolimonade);
-        al_destroy_bitmap(resources->frigocanneasucre);
-        al_destroy_bitmap(resources->cuisson);
-        al_destroy_bitmap(resources->sortie);
-        al_destroy_bitmap(resources->decoupe);
-        al_destroy_bitmap(resources->frigo);
-        al_destroy_bitmap(resources->verre);
-        al_destroy_bitmap(resources->poubelle);
-        al_destroy_bitmap(resources->presseAgrume);
+void detruireRessourcesJeu(RessourcesJeu *ressources) {
+    if (ressources) {
+        al_destroy_bitmap(ressources->sol1);
+        al_destroy_bitmap(ressources->sol2);
+        al_destroy_bitmap(ressources->plandetravail);
+        al_destroy_bitmap(ressources->frigomenthe);
+        al_destroy_bitmap(ressources->frigocitron);
+        al_destroy_bitmap(ressources->frigolimonade);
+        al_destroy_bitmap(ressources->frigocanneasucre);
+        al_destroy_bitmap(ressources->cuisson);
+        al_destroy_bitmap(ressources->sortie);
+        al_destroy_bitmap(ressources->decoupe);
+        al_destroy_bitmap(ressources->frigo);
+        al_destroy_bitmap(ressources->verre);
+        al_destroy_bitmap(ressources->poubelle);
+        al_destroy_bitmap(ressources->presseAgrume);
 
-        // Destroy other resources if any
-        if (resources->font) {
-            al_destroy_font(resources->font);
-        }
-        if (resources->display) {
-            al_destroy_display(resources->display);
-        }
-        if (resources->timer) {
-            al_destroy_timer(resources->timer);
-        }
-        if (resources->event_queue) {
-            al_destroy_event_queue(resources->event_queue);
+        for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+            free(ressources->ItemLaches.items[i]);
         }
 
-        free(resources);
+        if (ressources->font) {
+            al_destroy_font(ressources->font);
+        }
+        if (ressources->display) {
+            al_destroy_display(ressources->display);
+        }
+        if (ressources->timer) {
+            al_destroy_timer(ressources->timer);
+        }
+        if (ressources->event_queue) {
+            al_destroy_event_queue(ressources->event_queue);
+        }
+
+        free(ressources);
     }
 }
 
-// Fonction pour libérer un joueur
 void destroyJoueur(Joueur *joueur) {
     if (joueur) {
         if (joueur->bitmap) {
-            al_destroy_bitmap(joueur->bitmap);  // Libération du bitmap
+            al_destroy_bitmap(joueur->bitmap);
         }
-        free(joueur);  // Libération de la structure Joueur
+        free(joueur);
     }
 }
 
@@ -563,7 +549,7 @@ void afficherTemps(RessourcesJeu *ressources) {
                  ALLEGRO_ALIGN_CENTER, timeText);
 }
 
-void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources) {
+void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
     struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
@@ -577,45 +563,44 @@ void jeu(Joueur *joueur1, Joueur *joueur2, GameResources *resources) {
     struct Maillon *liste = NULL;
     struct Recette *recettes[NB_RECETTES] = {&mojito, &caipirinha, &hintzy, &plaza};
 
-    resources->startTime = al_get_time();  // Réinitialiser le temps au début du jeu
-    bool running = true;
+    ressources->startTime = al_get_time();
+    bool enCours = true;
 
-    while (running) {
+    while (enCours) {
         ALLEGRO_EVENT ev;
-        al_wait_for_event(resources->event_queue, &ev);
+        al_wait_for_event(ressources->event_queue, &ev);
 
-        double currentTime = al_get_time();
-        int remainingTime = DUREE_PARTIE - (int)(currentTime - resources->startTime);
+        double tempsActuel = al_get_time();
+        int tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime);
 
-        if (remainingTime <= 0) {
-            running = false;  // Arrêter la boucle de jeu lorsque le temps est écoulé
+        if (tempsRestant <= 0) {
+            enCours = false;
             continue;
         }
 
         switch (ev.type) {
             case ALLEGRO_EVENT_TIMER:
                 supprimerMaillonsExpire(&liste);
-                if (liste == NULL ||
-                    (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
+                if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
                     ajouterMaillonFin(&liste, recettes);
                 }
-                afficher_map(map, resources);
+                afficher_map(map, ressources);
+                mettreAJourTransformation(ressources);
                 dessinerToutMaillons(&liste, &imagesCommandes);
-                update_players_position(joueur1,joueur2, &map);
-                agir(joueur1, resources, &map);
-                afficherTemps(resources);
+                majPositionJoueur(joueur1, joueur2, &map);
+                afficherTemps(ressources);
                 al_flip_display();
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
-                handle_keyboard_events(ev, joueur1, joueur2);
+                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map);
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
-                running = false;
+                enCours = false;
                 break;
             default:
                 if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-                    running = false;
+                    enCours = false;
                 }
                 break;
         }

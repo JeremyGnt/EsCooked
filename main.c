@@ -40,8 +40,8 @@ int main() {
 
     bool fini = false;
 
-    GameResources *resources = initGameResources();
-    if (!resources) {
+    RessourcesJeu *ressources = initRessourcesJeu();
+    if (!ressources) {
         fprintf(stderr, "Failed to initialize game resources\n");
         return 1;
     }
@@ -63,13 +63,13 @@ int main() {
     assert(icone != NULL);
 
 
-    al_set_window_position(resources->display, 0, 0);
-    al_set_window_title(resources->display, "word.exe");
-    al_set_display_icon(resources->display, icone);
+    al_set_window_position(ressources->display, 0, 0);
+    al_set_window_title(ressources->display, "word.exe");
+    al_set_display_icon(ressources->display, icone);
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
 
-    al_set_window_position(resources->display, 0, 0);
+    al_set_window_position(ressources->display, 0, 0);
     al_set_new_display_flags(ALLEGRO_FULLSCREEN | ALLEGRO_RESIZABLE);
 
     //Images
@@ -91,8 +91,8 @@ int main() {
 
     //init
     const char *charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
-    int window_width = al_get_display_width(resources->display);
-    int window_height = al_get_display_height(resources->display);
+    int window_width = al_get_display_width(ressources->display);
+    int window_height = al_get_display_height(ressources->display);
 
 
     enum {
@@ -117,7 +117,7 @@ int main() {
 
     if (!joueur1.bitmap || !joueur2.bitmap) {
         fprintf(stderr, "Failed to load player bitmaps\n");
-        destroyGameResources(resources);
+        detruireRessourcesJeu(ressources);
         return -1;
     }
 
@@ -128,7 +128,7 @@ int main() {
     // Boucle d'événements
     while (!fini) {
         ALLEGRO_EVENT event;
-        al_wait_for_event(resources->event_queue, &event);
+        al_wait_for_event(ressources->event_queue, &event);
         switch (event.type) {
             case ALLEGRO_EVENT_DISPLAY_CLOSE: {
                 fini = true;
@@ -141,7 +141,7 @@ int main() {
                     state = menuf(&event, menu, fleche, pseudo, confirm,
                                   mrbeast, state, &son);
                     if(state == JEU){
-                        jeu(&joueur1, &joueur2, resources);
+                        jeu(&joueur1, &joueur2, ressources);
                     }
                 }
                 if(state == OFF){
@@ -158,7 +158,7 @@ int main() {
 
 
     // Libérations
-    destroyGameResources(resources);
+    detruireRessourcesJeu(ressources);
     destroy(mrbeast);
     destroy(icone);
     destroy(transparent);
