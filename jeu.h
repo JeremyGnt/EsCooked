@@ -11,19 +11,28 @@ typedef struct {
     int posJoueur1X, posJoueur1Y, posJoueur2X, posJoueur2Y;
 } fichierTexteMap;
 
-typedef struct {
+typedef struct Ingredient Ingredient;
+typedef struct VerreListe VerreListe;
+
+struct VerreListe {
+    Ingredient *ingredient;
+    struct VerreListe *next;
+};
+
+ struct Ingredient {
     int id;
+    int idIngredient;
     int x, y;
     ALLEGRO_BITMAP *bitmap;
     bool Tenir;
-    double tempsChargement; // Temps de début de la transformation
-} Ingredient;
+    double tempsTransformation; // Temps de début de la transformation
+    VerreListe *ingredientList;
+} ;
 
 typedef struct {
     Ingredient *items[10];
     int compte;
 } ItemLache;
-
 
 typedef struct {
     int x, y;
@@ -81,9 +90,12 @@ typedef struct {
 
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map);
 void afficher_map(fichierTexteMap map, RessourcesJeu *ressources);
-Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y);
+Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y, int idIngredient, const char *nom);
 void ajouterItemLache(ItemLache *itemsLache, Ingredient *ingredient);
 void enleveItemLache(ItemLache *itemsLache, Ingredient *ingredient);
+void ajouterIngredientListe(Ingredient *verre, Ingredient *ingredient);
+void libererListeIngredients(VerreListe *verre);
+void afficherIngredientsVerre(Ingredient *verre);
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
 void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map);
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
@@ -92,10 +104,5 @@ void detruireRessourcesJeu(RessourcesJeu *ressources);
 void destroyJoueur(Joueur *joueur);
 void afficherTemps(RessourcesJeu *ressources);
 void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
-void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
-
-
-
-
 
 #endif //ESCOOKED_JEU_H

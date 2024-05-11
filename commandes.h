@@ -3,13 +3,6 @@
 
 #include "general.h"
 /// commandes ///
-enum Ingredients {
-    CITRON_PRESSE,
-    ALCOOL_CUIT,
-    MENTHE_DECOUPE,
-    LIMONADE,
-    INGREDIENT_NULL
-};
 
 enum RecetteID {
     MOJITO,

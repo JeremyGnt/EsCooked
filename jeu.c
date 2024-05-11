@@ -26,12 +26,12 @@ void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
 }
 
 void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
-    int k,j;
+    int k = 0,j = 0, i = 0;
     if (ressources->fond) {
         al_draw_bitmap(ressources->fond, 0, 0, 0);
     }
     for (j = 0; j < NB_LIGNES; j++) {
-        for (int i = 0; i < NB_COLONNES; i++) {
+        for (i = 0; i < NB_COLONNES; i++) {
             ALLEGRO_BITMAP *bitmap = NULL;
             switch (map.map[i][j]) {
                 case 1: bitmap = ressources->sol1; break;
@@ -69,8 +69,8 @@ void afficher_map(fichierTexteMap map, RessourcesJeu *ressources) {
 }
 
 void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, double tempsTransformation) {
-    if (ingredient->tempsChargement > 0 && tempsTransformation > 0) {
-        double tempsEcoule = tempsActuel - ingredient->tempsChargement;
+    if (ingredient->tempsTransformation > 0 && tempsTransformation > 0) {
+        double tempsEcoule = tempsActuel - ingredient->tempsTransformation;
         double proportion = tempsEcoule / tempsTransformation;
         if (proportion > 1.0) proportion = 1.0;
 
@@ -89,7 +89,6 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
             float rouge = proportion * 2.0;
             couleurJauge = al_map_rgb_f(rouge, vert, 0.0);
         } else {
-
             float vert = 1.0 - ((proportion - 0.5) * 2.0);
             couleurJauge = al_map_rgb_f(1.0, vert, 0.0);
         }
@@ -100,7 +99,7 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
 }
 
 void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
-    int d,i;
+    int d = 0,i =0;
     Sons son;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
@@ -110,7 +109,7 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
     for (d = 0; d < 4; d++) {
         int adjX = mapX + directions[d][0];
         int adjY = mapY + directions[d][1];
-        if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue;
+        if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue; // si en dehors, alors iteration suivante
 
         int typeDeCase = map->map[adjX][adjY];
         bool directionRegard = (directions[d][0] == (joueur->vx > 0 ? 1 : (joueur->vx < 0 ? -1 : 0))) &&
@@ -153,12 +152,24 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
             }
 
             if (nouveauBitmap) {
-                if (ingredient->tempsChargement == 0) {
-                    ingredient->tempsChargement = tempsActuel;
+                if (ingredient->tempsTransformation == 0) {
+                    ingredient->tempsTransformation = tempsActuel;
                 }
-                if (tempsActuel - ingredient->tempsChargement >= tempsTransformation) {
+                if (tempsActuel - ingredient->tempsTransformation >= tempsTransformation) {
                     ingredient->bitmap = nouveauBitmap;
-                    ingredient->tempsChargement = 0;
+                    ingredient->tempsTransformation = 0;
+                    if (nouveauBitmap == ressources->mentheDecoupe) {
+                        ingredient->idIngredient = MENTHE_DECOUPE;
+                    } else if (nouveauBitmap == ressources->citronDecoupe) {
+                        ingredient->idIngredient = CITRON_DECOUPE;
+                    } else if (nouveauBitmap == ressources->alcoolCuit) {
+                        ingredient->idIngredient = ALCOOL_CUIT;
+                    } else if (nouveauBitmap == ressources->citronPresse) {
+                        ingredient->idIngredient = CITRON_PRESSE;
+                    } else {
+                        ingredient->idIngredient = ingredient->idIngredient; // Aucun changement
+                    }
+
                 } else if (iconeTransformation) {
                     al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
                     dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
@@ -169,12 +180,50 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
     }
 }
 
+void afficherIngredientsVerre(Ingredient *verre) {
+    VerreListe *actuel = verre->ingredientList;
+    printf("ingredients dans le verre:\n");
+
+    while (actuel) {
+        switch (actuel->ingredient->idIngredient) {
+            case CITRON_BRUT:
+                printf(" - Citron Brut\n");
+                break;
+            case CITRON_DECOUPE:
+                printf(" - Citron Decoupe\n");
+                break;
+            case CITRON_PRESSE:
+                printf(" - Citron Presse\n");
+                break;
+            case CANNE_A_SUCRE_BRUT:
+                printf(" - Canne a Sucre Brut\n");
+                break;
+            case ALCOOL_CUIT:
+                printf(" - Alcool Cuit\n");
+                break;
+            case MENTHE_BRUT:
+                printf(" - Menthe Brut\n");
+                break;
+            case MENTHE_DECOUPE:
+                printf(" - Menthe Decoupe\n");
+                break;
+            case LIMONADE:
+                printf(" - Limonade\n");
+                break;
+            default:
+                printf(" inconito \n");
+                break;
+        }
+        actuel = actuel->next;
+    }
+}
+
 void mettreAJourTransformation(RessourcesJeu *ressources) {
     int i;
     double tempsActuel = al_get_time();
     for (i = 0; i < ressources->ItemLaches.compte; i++) {
         Ingredient *ingredient = ressources->ItemLaches.items[i];
-        if (ingredient && ingredient->tempsChargement > 0) {
+        if (ingredient && ingredient->tempsTransformation > 0) {
             double tempsTransformation = 0;
             ALLEGRO_BITMAP *nouveauBitmap = NULL;
             ALLEGRO_BITMAP *iconeTransformation = NULL;
@@ -198,9 +247,21 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
             }
 
             if (nouveauBitmap) {
-                if (tempsActuel - ingredient->tempsChargement >= tempsTransformation) {
+                if (tempsActuel - ingredient->tempsTransformation >= tempsTransformation) {
                     ingredient->bitmap = nouveauBitmap;
-                    ingredient->tempsChargement = 0;
+                    ingredient->tempsTransformation = 0;
+                    if (nouveauBitmap == ressources->mentheDecoupe) {
+                        ingredient->idIngredient = MENTHE_DECOUPE;
+                    } else if (nouveauBitmap == ressources->citronDecoupe) {
+                        ingredient->idIngredient = CITRON_DECOUPE;
+                    } else if (nouveauBitmap == ressources->alcoolCuit) {
+                        ingredient->idIngredient = ALCOOL_CUIT;
+                    } else if (nouveauBitmap == ressources->citronPresse) {
+                        ingredient->idIngredient = CITRON_PRESSE;
+                    } else {
+                        ingredient->idIngredient = ingredient->idIngredient; //ps changement
+                    }
+
                 } else if (iconeTransformation) {
                     al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
                     dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
@@ -210,15 +271,18 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
     }
 }
 
-Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y) {
+Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y, int idIngredient, const char *nom) {
     Ingredient *ingredient = malloc(sizeof(Ingredient));
     if (ingredient) {
         ingredient->id = ingredientSuivant++;
+        ingredient->idIngredient = idIngredient;
         ingredient->x = x;
         ingredient->y = y;
         ingredient->bitmap = bitmap;
         ingredient->Tenir = false;
-        ingredient->tempsChargement = 0;
+        ingredient->tempsTransformation = 0;
+        ingredient->ingredientList = NULL;
+
     }
     return ingredient;
 }
@@ -227,7 +291,7 @@ void ajouterItemLache(ItemLache *itemsLache, Ingredient *ingredient) {
     if (itemsLache->compte < 10) {
         itemsLache->items[itemsLache->compte++] = ingredient;
     } else {
-        fprintf(stderr, "Taux d'items max atteint\n");
+        printf("Taux d'items max atteint\n");
     }
 }
 
@@ -243,13 +307,30 @@ void enleveItemLache(ItemLache *itemsLache, Ingredient *ingredient) {
     }
 }
 
+void ajouterIngredientListe(Ingredient *verre, Ingredient *ingredient) {
+    VerreListe *nouvelleIngredient = malloc(sizeof(VerreListe));
+    if (nouvelleIngredient) {
+        nouvelleIngredient->ingredient = ingredient;
+        nouvelleIngredient->next = verre->ingredientList;
+        verre->ingredientList = nouvelleIngredient;
+    }
+}
+
+void libererListeIngredients(VerreListe *verre) {
+    VerreListe *temp;
+    while (verre) {
+        temp = verre;
+        verre = verre->next;
+        free(temp);
+    }
+}
+
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
-    int d,i;
-    static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
 
-    for (d = 0; d < 4; d++) {
+    for (int d = 0; d < 4; d++) {
         int adjX = mapX + directions[d][0];
         int adjY = mapY + directions[d][1];
         if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue;
@@ -268,7 +349,17 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
                     (typeDeCase == 32) ? ressources->limonade :
                     (typeDeCase == 33) ? ressources->canneasucreBrut : NULL,
                     joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
-                    joueur->y - al_get_bitmap_height(joueur->bitmap) / 2
+                    joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                    (typeDeCase == 10) ? INGREDIENT_NULL :
+                    (typeDeCase == 30) ? MENTHE_BRUT :
+                    (typeDeCase == 31) ? CITRON_BRUT :
+                    (typeDeCase == 32) ? LIMONADE :
+                    (typeDeCase == 33) ? CANNE_A_SUCRE_BRUT : INGREDIENT_NULL,
+                    (typeDeCase == 10) ? "Verre" :
+                    (typeDeCase == 30) ? "Menthe Brut" :
+                    (typeDeCase == 31) ? "Citron Brut" :
+                    (typeDeCase == 32) ? "Limonade" :
+                    (typeDeCase == 33) ? "Canne à Sucre Brut" : "Inconnu"
             );
             if (joueur->ingredient != NULL) {
                 joueur->ingredient->Tenir = true;
@@ -277,26 +368,49 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
         }
 
         if (typeDeCase == 6 && joueur->ingredient != NULL) {
+            if (joueur->ingredient->ingredientList) {
+                libererListeIngredients(joueur->ingredient->ingredientList);
+            }
             free(joueur->ingredient);
             joueur->ingredient = NULL;
             return;
         }
 
-        if (typeDeCase == 9 || typeDeCase == 5 || typeDeCase == 8 || typeDeCase == 2) {
+        if (typeDeCase == 9 || typeDeCase == 5 || typeDeCase == 8 || typeDeCase == 2 || typeDeCase == 7) {
             if (joueur->ingredient && joueur->ingredient->Tenir) {
-                joueur->ingredient->Tenir = false;
-                joueur->ingredient->x = adjX * TAILLE_CARRE + map->decalMapX;
-                joueur->ingredient->y = adjY * TAILLE_CARRE + map->decalMapY;
-                map->mapImages[adjX][adjY] = joueur->ingredient->bitmap;
-                ajouterItemLache(&ressources->ItemLaches, joueur->ingredient);
+                if (typeDeCase == 7 && joueur->ingredient->idIngredient == INGREDIENT_NULL) {
+                    afficherIngredientsVerre(joueur->ingredient);
+                }
+                Ingredient *verre = NULL;
+                for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+                    Ingredient *lache = ressources->ItemLaches.items[i];
+                    if (lache && lache->idIngredient == INGREDIENT_NULL &&
+                        lache->x == adjX * TAILLE_CARRE + map->decalMapX &&
+                        lache->y == adjY * TAILLE_CARRE + map->decalMapY) {
+                        verre = lache;
+                        break;
+                    }
+                }
+
+                if (verre) {
+                    ajouterIngredientListe(verre, joueur->ingredient);
+                } else {
+                    joueur->ingredient->Tenir = false;
+                    joueur->ingredient->x = adjX * TAILLE_CARRE + map->decalMapX;
+                    joueur->ingredient->y = adjY * TAILLE_CARRE + map->decalMapY;
+                    map->mapImages[adjX][adjY] = joueur->ingredient->bitmap;
+                    ajouterItemLache(&ressources->ItemLaches, joueur->ingredient);
+                }
                 joueur->ingredient = NULL;
                 return;
             } else {
                 Ingredient *ingredientPlusProche = NULL;
                 int distanceMinimale = INT_MAX;
-                for (i = 0; i < ressources->ItemLaches.compte; i++) {
+                for (int i = 0; i < ressources->ItemLaches.compte; i++) {
                     Ingredient *lache = ressources->ItemLaches.items[i];
                     if (lache && lache->x == adjX * TAILLE_CARRE + map->decalMapX && lache->y == adjY * TAILLE_CARRE + map->decalMapY) {
+                        if (lache->tempsTransformation > 0) continue;
+
                         int distance = abs(lache->x - (adjX * TAILLE_CARRE + map->decalMapX)) +
                                        abs(lache->y - (adjY * TAILLE_CARRE + map->decalMapY));
                         if (distance < distanceMinimale) {
@@ -392,8 +506,8 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
     Joueur *joueurs[2] = {joueur1, joueur2};
 
-    for (int idx = 0; idx < 2; idx++) {
-        Joueur *joueur = joueurs[idx];
+    for (int indexJoueur = 0; indexJoueur < 2; indexJoueur++) {
+        Joueur *joueur = joueurs[indexJoueur];
         float nextX = joueur->x + joueur->vx;
         float nextY = joueur->y + joueur->vy;
 
@@ -401,10 +515,13 @@ void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
             joueur->angle = atan2(joueur->vy, joueur->vx) + M_PI / 2;
         }
 
-        Joueur *autre = joueurs[1 - idx];
-        float buffer = joueur->bitmap ? al_get_bitmap_width(joueur->bitmap) : 0;
+        Joueur *autre = joueurs[1 - indexJoueur];
+        float temporaire = 0;
+        if (joueur->bitmap != NULL) {
+            temporaire = al_get_bitmap_width(joueur->bitmap);
+        }
 
-        if (fabs(nextX - autre->x) < buffer && fabs(nextY - autre->y) < buffer) continue;
+        if (fabs(nextX - autre->x) < temporaire && fabs(nextY - autre->y) < temporaire) continue; // collision entre les 2 joueurs
 
         int mapX = (int)((nextX - map->decalMapX) / TAILLE_CARRE);
         int mapY = (int)((nextY - map->decalMapY) / TAILLE_CARRE);
@@ -417,7 +534,7 @@ void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
             }
         }
 
-        if (joueur->ingredient && joueur->ingredient->Tenir) {
+        if (joueur->ingredient != NULL && joueur->ingredient->Tenir) {
             joueur->ingredient->x = joueur->x;
             joueur->ingredient->y = joueur->y;
         }
@@ -425,12 +542,12 @@ void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
 
     for (int i = 0; i < 2; i++) {
         Joueur *joueur = joueurs[i];
-        if (joueur->bitmap) {
+        if (joueur->bitmap != NULL) {
             al_draw_rotated_bitmap(joueur->bitmap, al_get_bitmap_width(joueur->bitmap) / 2,
                                    al_get_bitmap_height(joueur->bitmap) / 2, joueur->x, joueur->y, joueur->angle, 0);
         }
 
-        if (joueur->ingredient && joueur->ingredient->Tenir) {
+        if (joueur->ingredient != NULL && joueur->ingredient->Tenir) {
             al_draw_bitmap(joueur->ingredient->bitmap, joueur->ingredient->x, joueur->ingredient->y, 0);
         }
     }
@@ -547,12 +664,12 @@ void afficherTemps(RessourcesJeu *ressources) {
     int posY = HEIGHT - al_get_bitmap_height(ressources->macaronTemps);
     al_draw_bitmap(ressources->macaronTemps, posX, posY, 0);
 
-    char timeText[100];
-    sprintf(timeText, "%02d:%02d", tempsRestant / 60, tempsRestant % 60);
+    char temps[100];
+    sprintf(temps, "%02d:%02d", tempsRestant / 60, tempsRestant % 60);
     al_draw_text(ressources->font, NOIR, posX + al_get_bitmap_width(ressources->macaronTemps) / 2,
                  posY + al_get_bitmap_height(ressources->macaronTemps) / 2 -
                  al_get_font_line_height(ressources->font) / 2,
-                 ALLEGRO_ALIGN_CENTER, timeText);
+                 ALLEGRO_ALIGN_CENTER, temps);
 }
 
 void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
@@ -589,6 +706,12 @@ void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                 supprimerMaillonsExpire(&liste);
                 if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
                     ajouterMaillonFin(&liste, recettes);
+                }
+                double tempsprecedent = 0;
+                double tempsactuel = al_get_time();
+                if (tempsactuel - tempsprecedent >= 5.0) {
+                   // afficherIngredientsEnCours(&liste);
+                    tempsprecedent = tempsactuel;
                 }
                 afficher_map(map, ressources);
                 mettreAJourTransformation(ressources);
