@@ -34,6 +34,7 @@ void ajouterMaillonFin(struct Maillon **pListe, struct Recette *recettes[NB_RECE
     struct Maillon *nouveau = (struct Maillon *) calloc(1, sizeof(struct Maillon));
     nouveau->recette = recettes[choix];
     nouveau->tempsCreation = get_current_time();
+    nouveau->tempsAccumulePause = 0;  // Initialisation
     nouveau->next = NULL;
 
     if (*pListe == NULL) {
@@ -53,7 +54,7 @@ void supprimerMaillonsExpire(struct Maillon **pListe) {
 
     while (parcours != NULL) {
         double tempsActuel = get_current_time();
-        int tempsPasse = (int) (tempsActuel - parcours->tempsCreation);
+        int tempsPasse = (int) (tempsActuel - parcours->tempsCreation - parcours->tempsAccumulePause);
 
         if (tempsPasse >= DUREE_VIE) {
             if (precedent == NULL) {
@@ -87,8 +88,7 @@ void dessinerMaillon(struct Maillon *maillon, struct imagesCommandes *images, fl
     // Dessin des images de commande
     ALLEGRO_BITMAP *ingredient_image = images->tableauBitmap[maillon->recette->id + 4];
     float ingredient_width = maillon_width * 0.8; // reduire la largeur à 80% de celle du maillon
-    float ingredient_height = al_get_bitmap_height(ingredient_image) * (ingredient_width / al_get_bitmap_width(
-            ingredient_image));
+    float ingredient_height = al_get_bitmap_height(ingredient_image) * (ingredient_width / al_get_bitmap_width(ingredient_image));
     al_draw_scaled_bitmap(ingredient_image,
                           0, 0, al_get_bitmap_width(ingredient_image), al_get_bitmap_height(ingredient_image),
                           x + (maillon_width - ingredient_width) / 2,
@@ -117,15 +117,13 @@ void dessinerMaillon(struct Maillon *maillon, struct imagesCommandes *images, fl
 
     // Dessin de la barre de progression au-dessus du maillon
     double temps_actuel = get_current_time();
-    double temps_restant = DUREE_VIE - (temps_actuel - maillon->tempsCreation);
+    double temps_restant = DUREE_VIE - (temps_actuel - maillon->tempsCreation - maillon->tempsAccumulePause);
     double proportion_restante = temps_restant / DUREE_VIE;
     float bar_start = x + 6; // Debut de la barre, 3 pixels à l'intérieur du maillon
     float bar_end = x + maillon_width - 6; // Fin de la barre, 3 pixels avant la fin du maillon
     float bar_width = (bar_end - bar_start) * proportion_restante;
     ALLEGRO_COLOR bar_color = al_map_rgb_f(1.0 - proportion_restante, proportion_restante, 0);
     al_draw_filled_rectangle(bar_start, y - 6, bar_start + bar_width, y, bar_color);
-
-
 }
 
 void dessinerToutMaillons(struct Maillon **pListe, imagesCommandes *images) {

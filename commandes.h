@@ -16,11 +16,12 @@ struct Recette {
     int ingredients[5];
 };
 
-struct Maillon {
+typedef struct Maillon {
     struct Recette *recette;
     double tempsCreation;
+    double tempsAccumulePause;  // Ajouter cette ligne
     struct Maillon *next;
-};
+} Maillon;
 
 struct imagesCommandes {
     ALLEGRO_BITMAP *tableauBitmap[NOMBRE_IMAGES];

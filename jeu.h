@@ -52,6 +52,8 @@ typedef struct {
     ALLEGRO_TIMER *timer;
     ALLEGRO_TIMER *timer_commande;
     double startTime;
+    double tempsAccumulePause;
+
 
     ALLEGRO_BITMAP *sol1;
     ALLEGRO_BITMAP *plandetravail;
@@ -100,7 +102,7 @@ void ajouterIngredientListe(Ingredient *verre, Ingredient *ingredient);
 void libererListeIngredients(VerreListe *verre);
 void afficherIngredientsVerre(Ingredient *verre);
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
-void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map);
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map,bool pause);
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
 RessourcesJeu *initRessourcesJeu();
 void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);

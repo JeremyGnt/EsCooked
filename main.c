@@ -21,6 +21,39 @@
 void destroy(ALLEGRO_BITMAP *buh) {
     al_destroy_bitmap(buh);
 }
+void initialiserJoueurs(Joueur *joueur1, Joueur *joueur2) {
+    joueur1->x = 424;
+    joueur1->y = 361;
+    joueur1->vx = 0;
+    joueur1->vy = 0;
+    joueur1->angle = 0;
+    joueur1->ingredient = NULL;
+    joueur1->bitmap = al_load_bitmap("../images/perso 1.png");
+
+    joueur2->x = 824;
+    joueur2->y = 361;
+    joueur2->vx = 0;
+    joueur2->vy = 0;
+    joueur2->angle = 0;
+    joueur2->ingredient = NULL;
+    joueur2->bitmap = al_load_bitmap("../images/perso 2.png");
+}
+
+void reinitialiserRessourcesJeu(RessourcesJeu *ressources) {
+    if (ressources) {
+        ressources->startTime = al_get_time();
+        ressources->tempsAccumulePause = 0;
+
+        // Réinitialiser la liste des items lâchés
+        for (int i = 0; i < 10; i++) {
+            if (ressources->ItemLaches.items[i]) {
+                free(ressources->ItemLaches.items[i]);
+                ressources->ItemLaches.items[i] = NULL;
+            }
+        }
+        ressources->ItemLaches.compte = 0;
+    }
+}
 
 int main() {
     // Initialisations / Installations
@@ -127,7 +160,6 @@ int main() {
     declarationMenu(fleche, menu);
     transitionmenu(Fleche, fond, perso1, boxesM);
 
-
     Joueur joueur1 = {
             .x = 424,
             .y = 361,
@@ -140,7 +172,6 @@ int main() {
             .bitmap = al_load_bitmap("../images/perso 2.png"),
     };
 
-
     initialiserRessourcesAudio(&son);
     jouerMusiqueMenu(&son);
 
@@ -149,7 +180,7 @@ int main() {
     while (!fini) {
         ALLEGRO_EVENT event;
         al_wait_for_event(ressources->event_queue, &event);
-        if(state == MENUPRINCIPAL && retour == 1){
+        if (state == MENUPRINCIPAL && retour == 1) {
             transitionmenu(Fleche, fond, perso1, boxesM);
             jouerMusiqueMenu(&son);
             retour = 0;
@@ -160,18 +191,19 @@ int main() {
                 break;
             }
 
-
             case ALLEGRO_EVENT_KEY_DOWN: {
-                if(state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL){
-                    state = menuf(&event, fond, Fleche, perso1, perso2,
-                                      boxesM, pseudoM, confirM, state, &son);
+                if (state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL) {
+                    state = menuf(&event, fond, Fleche, perso1, perso2, boxesM, pseudoM, confirM, state, &son);
                 }
-                if(state == JEU){
+                if (state == JEU) {
+                    // Réinitialiser le jeu avant de commencer une nouvelle partie
+                    reinitialiserRessourcesJeu(ressources);
+                    initialiserJoueurs(&joueur1, &joueur2);
                     state = jeu(&joueur1, &joueur2, ressources);
                     arreterMusiqueJeu(&son);
                     retour = 1;
                 }
-                if(state == OFF){
+                if (state == OFF) {
                     fini = true;
                 }
                 break;
@@ -182,6 +214,7 @@ int main() {
             }
         }
     }
+
 
 
     // Libérations

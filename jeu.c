@@ -450,9 +450,10 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
     }
 }
 
-void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map) {
-    float vitesse = 1.0;
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map, bool pause) {
+    if (pause) return;  // Ignorer les événements de clavier si en pause
 
+    float vitesse = 1.0;
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_Z:
@@ -615,6 +616,8 @@ RessourcesJeu *initRessourcesJeu() {
     ressources->MenuPause = al_load_bitmap("../images/MenuPause.png");
 
     ressources->startTime = al_get_time();
+    ressources->tempsAccumulePause = 0;
+
 
     al_init_font_addon();
     al_init_ttf_addon();
@@ -679,7 +682,7 @@ void destroyJoueur(Joueur *joueur) {
 
 void afficherTemps(RessourcesJeu *ressources) {
     double tempsActuel = al_get_time();
-    int tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime);
+    int tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime - ressources->tempsAccumulePause);
     if (tempsRestant < 0) tempsRestant = 0;
 
     int posX = WIDTH - al_get_bitmap_width(ressources->macaronTemps) - 10;
@@ -712,6 +715,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
     ressources->startTime = al_get_time();
 
     int state = 5, pause = 0, tempsRestant;
+    double tempsPauseDebut = 0;
 
     bool enCours = true;
 
@@ -719,10 +723,10 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(ressources->event_queue, &ev);
 
-        double tempsActuel = al_get_time(), tempsPause;
+        double tempsActuel = al_get_time();
 
-        if(!pause){
-            tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime);
+        if (!pause) {
+            tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime - ressources->tempsAccumulePause);
         }
 
         if (tempsRestant <= 0) {
@@ -730,47 +734,48 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
             continue;
         }
 
-        if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
-            if(ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
+        if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 al_draw_bitmap(ressources->MenuPause, 0, 0, 0);
                 pause = 1;
+                tempsPauseDebut = al_get_time();  // Enregistrer le début de la pause
                 al_flip_display();
             }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER){
-                if(pause){
+            if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER) {
+                if (pause) {
                     enCours = false;
                     state = 0;
                 }
             }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_SPACE){
-                if(pause){
+            if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
+                if (pause) {
                     pause = 0;
+                    double tempsPauseFin = al_get_time();
+                    double pauseDuree = tempsPauseFin - tempsPauseDebut;
+                    ressources->tempsAccumulePause += pauseDuree;
+
+                    // Ajuster tempsAccumulePause pour chaque maillon
+                    struct Maillon *parcours = liste;
+                    while (parcours != NULL) {
+                        parcours->tempsAccumulePause += pauseDuree;
+                        parcours = parcours->next;
+                    }
                 }
             }
         }
 
-        switch (ev.type) {
+            switch (ev.type) {
             case ALLEGRO_EVENT_TIMER:
-                supprimerMaillonsExpire(&liste);
-                if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
-                    ajouterMaillonFin(&liste, recettes);
-                }
-                double tempsprecedent = 0;
-                double tempsactuel = al_get_time();
-                if (tempsactuel - tempsprecedent >= 5.0) {
-                   // afficherIngredientsEnCours(&liste);
-                    tempsprecedent = tempsactuel;
-                }
-                afficher_map(map, ressources);
-                mettreAJourTransformation(ressources);
-                dessinerToutMaillons(&liste, &imagesCommandes);
-                majPositionJoueur(joueur1, joueur2, &map);
-                afficherTemps(ressources);
-                al_flip_display();
-                if(!pause){
+                if (!pause) {
                     supprimerMaillonsExpire(&liste);
                     if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
                         ajouterMaillonFin(&liste, recettes);
+                    }
+                    double tempsprecedent = 0;
+                    double tempsactuel = al_get_time();
+                    if (tempsactuel - tempsprecedent >= 5.0) {
+                        // afficherIngredientsEnCours(&liste);
+                        tempsprecedent = tempsactuel;
                     }
                     afficher_map(map, ressources);
                     mettreAJourTransformation(ressources);
@@ -782,10 +787,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
-
-                if(!pause){
-                    gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map);
-                }
+                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map, pause);
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 enCours = false;
