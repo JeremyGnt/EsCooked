@@ -326,7 +326,7 @@ void libererListeIngredients(VerreListe *verre) {
 }
 
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
-    const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
 
@@ -342,25 +342,44 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
         if (!directionRegard) continue;
 
         if ((typeDeCase == 10 || (typeDeCase >= 30 && typeDeCase <= 33)) && joueur->ingredient == NULL) {
-            joueur->ingredient = creer_ingredient(
-                    (typeDeCase == 10) ? ressources->verre :
-                    (typeDeCase == 30) ? ressources->mentheBrut :
-                    (typeDeCase == 31) ? ressources->citronBrut :
-                    (typeDeCase == 32) ? ressources->limonade :
-                    (typeDeCase == 33) ? ressources->canneasucreBrut : NULL,
-                    joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
-                    joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
-                    (typeDeCase == 10) ? INGREDIENT_NULL :
-                    (typeDeCase == 30) ? MENTHE_BRUT :
-                    (typeDeCase == 31) ? CITRON_BRUT :
-                    (typeDeCase == 32) ? LIMONADE :
-                    (typeDeCase == 33) ? CANNE_A_SUCRE_BRUT : INGREDIENT_NULL,
-                    (typeDeCase == 10) ? "Verre" :
-                    (typeDeCase == 30) ? "Menthe Brut" :
-                    (typeDeCase == 31) ? "Citron Brut" :
-                    (typeDeCase == 32) ? "Limonade" :
-                    (typeDeCase == 33) ? "Canne à Sucre Brut" : "Inconnu"
-            );
+            if (typeDeCase == 10) {
+                joueur->ingredient = creer_ingredient(ressources->verre,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      INGREDIENT_NULL,
+                                                      "Verre");
+            } else if (typeDeCase == 30) {
+                joueur->ingredient = creer_ingredient(ressources->mentheBrut,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      MENTHE_BRUT,
+                                                      "Menthe Brut");
+            } else if (typeDeCase == 31) {
+                joueur->ingredient = creer_ingredient(ressources->citronBrut,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      CITRON_BRUT,
+                                                      "Citron Brut");
+            } else if (typeDeCase == 32) {
+                joueur->ingredient = creer_ingredient(ressources->limonade,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      LIMONADE,
+                                                      "Limonade");
+            } else if (typeDeCase == 33) {
+                joueur->ingredient = creer_ingredient(ressources->canneasucreBrut,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      CANNE_A_SUCRE_BRUT,
+                                                      "Canne à Sucre Brut");
+            } else {
+                joueur->ingredient = creer_ingredient(NULL,
+                                                      joueur->x + al_get_bitmap_width(joueur->bitmap) / 2,
+                                                      joueur->y - al_get_bitmap_height(joueur->bitmap) / 2,
+                                                      INGREDIENT_NULL,
+                                                      "Inconnito");
+            }
+
             if (joueur->ingredient != NULL) {
                 joueur->ingredient->Tenir = true;
             }

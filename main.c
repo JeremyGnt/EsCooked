@@ -140,11 +140,6 @@ int main() {
             .bitmap = al_load_bitmap("../images/perso 2.png"),
     };
 
-    if (!joueur1.bitmap || !joueur2.bitmap) {
-        fprintf(stderr, "Failed to load player bitmaps\n");
-        void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);
-            return -1;
-    }
 
     initialiserRessourcesAudio(&son);
     jouerMusiqueMenu(&son);
