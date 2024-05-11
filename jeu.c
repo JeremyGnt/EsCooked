@@ -476,6 +476,7 @@ RessourcesJeu *initRessourcesJeu() {
     ressources->iconeCuisson = al_load_bitmap("../images/icone cuisson.png");
     ressources->iconeDecoupe = al_load_bitmap("../images/icone decoupe.png");
     ressources->iconePresse = al_load_bitmap("../images/icone presse.png");
+    ressources->MenuPause = al_load_bitmap("../images/MenuPause.png");
 
     ressources->startTime = al_get_time();
 
@@ -491,7 +492,7 @@ RessourcesJeu *initRessourcesJeu() {
     return ressources;
 }
 
-void detruireRessourcesJeu(RessourcesJeu *ressources) {
+void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2) {
     if (ressources) {
         al_destroy_bitmap(ressources->sol1);
         al_destroy_bitmap(ressources->sol2);
@@ -507,6 +508,7 @@ void detruireRessourcesJeu(RessourcesJeu *ressources) {
         al_destroy_bitmap(ressources->verre);
         al_destroy_bitmap(ressources->poubelle);
         al_destroy_bitmap(ressources->presseAgrume);
+        al_destroy_bitmap(ressources->MenuPause);
 
         for (int i = 0; i < ressources->ItemLaches.compte; i++) {
             free(ressources->ItemLaches.items[i]);
@@ -524,6 +526,8 @@ void detruireRessourcesJeu(RessourcesJeu *ressources) {
         if (ressources->event_queue) {
             al_destroy_event_queue(ressources->event_queue);
         }
+        destroyJoueur(joueur1);
+        destroyJoueur(joueur2);
 
         free(ressources);
     }
@@ -555,7 +559,8 @@ void afficherTemps(RessourcesJeu *ressources) {
                  ALLEGRO_ALIGN_CENTER, timeText);
 }
 
-void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
+
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
     struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
@@ -570,49 +575,75 @@ void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
     struct Recette *recettes[NB_RECETTES] = {&mojito, &caipirinha, &hintzy, &plaza};
 
     ressources->startTime = al_get_time();
+
+    int state = 5, pause = 0, tempsRestant;
+
     bool enCours = true;
 
     while (enCours) {
         ALLEGRO_EVENT ev;
         al_wait_for_event(ressources->event_queue, &ev);
 
-        double tempsActuel = al_get_time();
-        int tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime);
+        double tempsActuel = al_get_time(), tempsPause;
+
+        if(!pause){
+            tempsRestant = DUREE_PARTIE - (int)(tempsActuel - ressources->startTime);
+        }
 
         if (tempsRestant <= 0) {
             enCours = false;
             continue;
         }
 
+        if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
+            if(ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
+                al_draw_bitmap(ressources->MenuPause, 0, 0, 0);
+                pause = 1;
+                al_flip_display();
+            }
+            if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER){
+                if(pause){
+                    enCours = false;
+                    state = 0;
+                }
+            }
+            if(ev.keyboard.keycode == ALLEGRO_KEY_SPACE){
+                if(pause){
+                    pause = 0;
+                }
+            }
+        }
+
         switch (ev.type) {
             case ALLEGRO_EVENT_TIMER:
-                supprimerMaillonsExpire(&liste);
-                if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
-                    ajouterMaillonFin(&liste, recettes);
+                if(!pause){
+                    supprimerMaillonsExpire(&liste);
+                    if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
+                        ajouterMaillonFin(&liste, recettes);
+                    }
+                    afficher_map(map, ressources);
+                    mettreAJourTransformation(ressources);
+                    dessinerToutMaillons(&liste, &imagesCommandes);
+                    majPositionJoueur(joueur1, joueur2, &map);
+                    afficherTemps(ressources);
+                    al_flip_display();
                 }
-                afficher_map(map, ressources);
-                mettreAJourTransformation(ressources);
-                dessinerToutMaillons(&liste, &imagesCommandes);
-                majPositionJoueur(joueur1, joueur2, &map);
-                afficherTemps(ressources);
-                al_flip_display();
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
-                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map);
+
+                if(!pause){
+                    gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map);
+                }
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 enCours = false;
                 break;
             default:
-                if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
-                    enCours = false;
-                }
                 break;
         }
     }
     libererListeCommande(&liste);
-    destroyJoueur(joueur1);
-    destroyJoueur(joueur2);
+    return state;
 }
 
