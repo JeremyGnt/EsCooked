@@ -34,6 +34,7 @@ typedef struct {
     int compte;
 } ItemLache;
 
+
 typedef struct {
     int x, y;
     ALLEGRO_BITMAP *bitmap;
@@ -83,6 +84,8 @@ typedef struct {
     ALLEGRO_BITMAP *iconeDecoupe;
     ALLEGRO_BITMAP *iconePresse;
 
+    ALLEGRO_BITMAP *MenuPause;
+
     ItemLache ItemLaches;
 
 
@@ -100,9 +103,14 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
 void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map);
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
 RessourcesJeu *initRessourcesJeu();
-void detruireRessourcesJeu(RessourcesJeu *ressources);
+void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);
 void destroyJoueur(Joueur *joueur);
 void afficherTemps(RessourcesJeu *ressources);
-void jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
+void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
+
+
+
+
 
 #endif //ESCOOKED_JEU_H

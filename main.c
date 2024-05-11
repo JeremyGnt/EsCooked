@@ -116,6 +116,7 @@ int main() {
     const char *charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
     int window_width = al_get_display_width(ressources->display);
     int window_height = al_get_display_height(ressources->display);
+    int retour = 0;
 
 
     enum {
@@ -141,8 +142,8 @@ int main() {
 
     if (!joueur1.bitmap || !joueur2.bitmap) {
         fprintf(stderr, "Failed to load player bitmaps\n");
-        detruireRessourcesJeu(ressources);
-        return -1;
+        void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);
+            return -1;
     }
 
     initialiserRessourcesAudio(&son);
@@ -153,6 +154,11 @@ int main() {
     while (!fini) {
         ALLEGRO_EVENT event;
         al_wait_for_event(ressources->event_queue, &event);
+        if(state == MENUPRINCIPAL && retour == 1){
+            transitionmenu(Fleche, fond, perso1, boxesM);
+            jouerMusiqueMenu(&son);
+            retour = 0;
+        }
         switch (event.type) {
             case ALLEGRO_EVENT_DISPLAY_CLOSE: {
                 fini = true;
@@ -164,9 +170,11 @@ int main() {
                 if(state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL){
                     state = menuf(&event, fond, Fleche, perso1, perso2,
                                       boxesM, pseudoM, confirM, state, &son);
-                    if(state == JEU){
-                        jeu(&joueur1, &joueur2, ressources);
-                    }
+                }
+                if(state == JEU){
+                    state = jeu(&joueur1, &joueur2, ressources);
+                    arreterMusiqueJeu(&son);
+                    retour = 1;
                 }
                 if(state == OFF){
                     fini = true;
@@ -182,7 +190,7 @@ int main() {
 
 
     // Libérations
-    detruireRessourcesJeu(ressources);
+    detruireRessourcesJeu(ressources, &joueur1, &joueur2);
     destroy(mrbeast);
     destroy(icone);
     destroy(transparent);
