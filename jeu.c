@@ -797,6 +797,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                 if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                     enCours = false;
                 }
+
                 break;
         }
     }
