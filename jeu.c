@@ -733,8 +733,8 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
         if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
             if(ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
                 al_draw_bitmap(ressources->MenuPause, 0, 0, 0);
-                pause = 1;
                 al_flip_display();
+                pause = 1;
             }
             if(ev.keyboard.keycode == ALLEGRO_KEY_ENTER){
                 if(pause){
@@ -751,26 +751,16 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
 
         switch (ev.type) {
             case ALLEGRO_EVENT_TIMER:
-                supprimerMaillonsExpire(&liste);
-                if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
-                    ajouterMaillonFin(&liste, recettes);
-                }
-                double tempsprecedent = 0;
-                double tempsactuel = al_get_time();
-                if (tempsactuel - tempsprecedent >= 5.0) {
-                   // afficherIngredientsEnCours(&liste);
-                    tempsprecedent = tempsactuel;
-                }
-                afficher_map(map, ressources);
-                mettreAJourTransformation(ressources);
-                dessinerToutMaillons(&liste, &imagesCommandes);
-                majPositionJoueur(joueur1, joueur2, &map);
-                afficherTemps(ressources);
-                al_flip_display();
                 if(!pause){
                     supprimerMaillonsExpire(&liste);
                     if (liste == NULL || (rand() % FREQUENCE_NOUVELLE_RECETTE == 0 && nombreMaillons(&liste) < MAX_MAILLONS)) {
                         ajouterMaillonFin(&liste, recettes);
+                    }
+                    double tempsprecedent = 0;
+                    double tempsactuel = al_get_time();
+                    if (tempsactuel - tempsprecedent >= 5.0) {
+                        // afficherIngredientsEnCours(&liste);
+                        tempsprecedent = tempsactuel;
                     }
                     afficher_map(map, ressources);
                     mettreAJourTransformation(ressources);
