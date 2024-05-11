@@ -454,6 +454,7 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
     if (pause) return;  // Ignorer les événements de clavier si en pause
 
     float vitesse = 1.0;
+
     if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
         switch (event.keyboard.keycode) {
             case ALLEGRO_KEY_Z:
