@@ -14,13 +14,14 @@
 
 
 #define NBMENU 20
-#define SPACE 5
+#define SPACE 1
 #define NOIR al_map_rgb(0,0,0)
 #define BLANC al_map_rgb(255,255,255)
 
 void destroy(ALLEGRO_BITMAP *buh) {
     al_destroy_bitmap(buh);
 }
+
 void initialiserJoueurs(Joueur *joueur1, Joueur *joueur2) {
     joueur1->x = 424;
     joueur1->y = 361;
@@ -98,6 +99,9 @@ int main() {
     ALLEGRO_BITMAP *sonOn = NULL;
     ALLEGRO_BITMAP *sonOff = NULL;
 
+    ALLEGRO_FONT *font = al_load_ttf_font("..\\PNGS\\fonts\\britanic.ttf", 30, 0);
+    ALLEGRO_FONT *mfont = al_load_ttf_font("..\\PNGS\\fonts\\britanic.ttf", 15, 0);
+
 
     //icone
     ALLEGRO_BITMAP *icone = NULL;
@@ -106,7 +110,7 @@ int main() {
 
 
     al_set_window_position(ressources->display, 0, 0);
-    al_set_window_title(ressources->display, "word.exe");
+    al_set_window_title(ressources->display, "Escooked");
     al_set_display_icon(ressources->display, icone);
     al_clear_to_color(al_map_rgb(0, 0, 0));
 
@@ -145,16 +149,21 @@ int main() {
     sonOff = al_load_bitmap("..\\PNGS\\ImagesMenu\\SonDésactivé.png");
     assert(sonOff != NULL);
 
+    assert(font);
+    assert(mfont);
+
 
     //init
-    const char *charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
+    const char *charac = "A\0B\0C\0D\0E\0F\0G\0H\0I\0J\0K\0L\0M\0N\0O\0P\0Q\0R\0S\0T\0U\0V\0W\0X\0Y\0Z\0";
     int window_width = al_get_display_width(ressources->display);
     int window_height = al_get_display_height(ressources->display);
-    int retour = 0, mute = 0;
+    int retour = 0, mute = 0, a, nb1 = 0, nb2 = 0;
+    float x1 = 67, y1 = 147, x2 = 731, y2 = 147;
+    char pseudo1[21], pseudo2[21]; pseudo1[0] = '\0'; pseudo2[0] = '\0';
 
 
     enum {
-        MENUPRINCIPAL, NEW, GUIDE, OPT, QUIT, JEU, OFF
+        MENUPRINCIPAL, NEW, GUIDEMENU, OPT, QUIT, JEU, OFF, PSEUDO1, PSEUDO2
     };
     int state = MENUPRINCIPAL;
 
@@ -183,12 +192,12 @@ int main() {
         al_wait_for_event(ressources->event_queue, &event);
         if (state == MENUPRINCIPAL && retour == 1) {
             transitionmenu(Fleche, fond, perso1, boxesM);
-            if(mute == 0){
+            if (mute == 0) {
                 jouerMusiqueMenu(&son);
             }
             retour = 0;
         }
-        if(mute == 1){
+        if (mute == 1) {
             arreterMusiqueJeu(&son);
             arreterMusiqueMenu(&son);
         }
@@ -199,14 +208,139 @@ int main() {
             }
 
             case ALLEGRO_EVENT_KEY_DOWN: {
-                if (state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL) {
-                    state = menuf(&event, fond, Fleche, perso1, perso2, boxesM, pseudoM, confirM, guide, sonOn, sonOff, options, state, &mute, &son);
+                if (state == PSEUDO1) {
+                    char *current;
+                    if (event.keyboard.keycode <= 26 && event.keyboard.keycode >= 1) {
+                        if (nb1 < 19) {
+                            a = event.keyboard.keycode;
+                            current = &charac[(a - 1) * 2];
+                            pseudo1[nb1] = *current;
+                            nb1++;
+                            pseudo1[nb1]= '\0';
+                        }
+                        else{
+                            pseudo1[nb1] = '\0';
+                        }
+
+                    } else {
+                        a = 0;
+                    }
+                    float largeur = al_get_text_width(font, current);
+                    float hauteur = al_get_font_ascent(font);
+                    if (a && nb1 < 19) {
+                        al_draw_text(font, BLANC, x1, y1, 0, current);
+                        x1 = x1 + largeur + SPACE;
+                    } else {
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_BACKSPACE: {
+                                int x1temp;
+                                if(x1>67 + largeur){
+                                    x1temp = x1 - largeur;
+                                }
+                                else{
+                                    x1temp = 67;
+                                }
+                                if(nb1 > 0){
+                                    pseudo1[nb1 - 1] = '\0';
+                                    nb1--;
+
+                                }
+                                al_draw_bitmap(fond, 0, 0, 0);
+                                al_draw_bitmap(pseudoM, 0, 0, 0);
+                                x1 = 67;
+                                al_draw_text(font, BLANC, x1, y1, 0, pseudo1);
+                                x1 = x1temp;
+                                break;
+                            }
+                            case ALLEGRO_KEY_ESCAPE: {
+                                state = MENUPRINCIPAL;
+                                strcpy(pseudo1, "");
+                                x1 = 67; y1 = 147; x2 = 731; y2 = 147; nb1 = 0;
+                                transitionmenu(Fleche, fond, perso1, boxesM);
+                                arreterMusiqueJeu(&son);
+                                jouerMusiqueMenu(&son);
+                                break;
+                            }
+                            case ALLEGRO_KEY_ENTER: {
+                                printf("%s", pseudo1);
+                                if (pseudo1[0] != '\0') {
+                                    x1 = 67; y1 = 147; x2 = 731; y2 = 147;
+                                    state = PSEUDO2;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (state == PSEUDO2) {
+                    char *current;
+                    if (event.keyboard.keycode <= 26 && event.keyboard.keycode >= 1) {
+                        if (nb2 < 19) {
+                            a = event.keyboard.keycode;
+                            current = &charac[(a - 1) * 2];
+                            pseudo2[nb2] = *current;
+                            nb2++;
+                            pseudo2[nb2]= '\0';
+                        }
+
+                    } else {
+                        a = 0;
+                    }
+                    float largeur = al_get_text_width(font, current);
+                    float hauteur = al_get_font_ascent(font);
+                    if (a && nb2 < 19) {
+                        al_draw_text(font, BLANC, x2, y2, 0, current);
+                        x2 = x2 + largeur + SPACE;
+                    } else {
+                        switch (event.keyboard.keycode) {
+                            case ALLEGRO_KEY_BACKSPACE: {
+                                int x2temp;
+                                if(x2>67 + largeur){
+                                    x2temp = x2 - largeur;
+                                }
+                                else{
+                                    x2temp = 67;
+                                }
+                                if(nb2 > 0){
+                                    pseudo2[nb2 - 1] = '\0';
+                                    nb2--;
+
+                                }
+                                al_draw_bitmap(fond, 0, 0, 0);
+                                al_draw_bitmap(pseudoM, 0, 0, 0);
+                                x2 = 731; x1 = 67;
+                                al_draw_text(font, BLANC, x1, y1, 0, pseudo1);
+                                al_draw_text(font, BLANC, x2, y2, 0, pseudo2);
+                                x2 = x2temp;
+                                break;
+                            }
+                            case ALLEGRO_KEY_ESCAPE: {
+                                state = PSEUDO1;
+                                strcpy(pseudo2, "");
+                                al_draw_bitmap(fond, 0, 0, 0);
+                                al_draw_bitmap(pseudoM, 0, 0, 0);
+                                al_draw_text(font, BLANC, 67, y1, 0, pseudo1);
+                                x2 = 731; y2 = 147; nb2 = 0;
+                                break;
+                            }
+                            case ALLEGRO_KEY_ENTER: {
+                                if (pseudo2[0] != '\0') {
+                                    x1 = 67; y1 = 147; x2 = 731; y2 = 147;
+                                    state = JEU;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (state == QUIT || state == OPT || state == GUIDEMENU || state == NEW || state == MENUPRINCIPAL) {
+                    state = menuf(&event, fond, Fleche, perso1, perso2, boxesM, pseudoM, confirM, guide, sonOn, sonOff,
+                                  options, state, &mute, &son);
                 }
                 if (state == JEU) {
-                    // Réinitialiser le jeu avant de commencer une nouvelle partie
                     reinitialiserRessourcesJeu(ressources);
                     initialiserJoueurs(&joueur1, &joueur2);
-                    state = jeu(&joueur1, &joueur2, ressources,&son);
+                    state = jeu(&joueur1, &joueur2, ressources, &son, pseudo1, pseudo2, mfont);
                     arreterMusiqueJeu(&son);
                     retour = 1;
                 }
@@ -240,5 +374,11 @@ int main() {
     destroy(options);
     destroy(sonOn);
     destroy(sonOff);
+    al_destroy_font(font);
+    al_destroy_font(mfont);
+    strcpy(pseudo1, "");
+    strcpy(pseudo2, "");
     return 0;
 }
+
+
