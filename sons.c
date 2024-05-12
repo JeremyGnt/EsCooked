@@ -15,7 +15,7 @@ void initialiserRessourcesAudio(Sons *son){
     son->sonAccepter = al_load_sample("../Sons/interface-12-204786.wav");
     son->sonRetour = al_load_sample("../Sons/interface-10-204783.wav");
     son->sonCuisson = al_load_sample("../Sons/food-cooking-in-oil-178795.wav");
-    son->sonDecoupe = al_load_sample("../Sons/cutting-board-chops-scrapes-61998.wav");
+    son->sonDecoupe = al_load_sample("../Sons/knife-and-cutting-board-foley-1-184690.wav");
     son->sonPresse = al_load_sample("../Sons/juicy-splash-104642.wav");
     son->sonFin = al_load_sample("../Sons/negative_beeps-6008.wav");
 
@@ -45,12 +45,12 @@ void initialiserRessourcesAudio(Sons *son){
     al_attach_sample_instance_to_mixer(son->instanceSonCuisson, son->mixer);
 
     son->instanceSonDecoupe = al_create_sample_instance(son->sonDecoupe);
-    al_set_sample_instance_playmode(son->instanceSonDecoupe, ALLEGRO_PLAYMODE_LOOP);
+    al_set_sample_instance_playmode(son->instanceSonDecoupe, ALLEGRO_PLAYMODE_ONCE);
     al_set_sample_instance_gain(son->instanceSonDecoupe,0.5);
     al_attach_sample_instance_to_mixer(son->instanceSonDecoupe, son->mixer);
 
     son->instanceSonPresse = al_create_sample_instance(son->sonPresse);
-    al_set_sample_instance_playmode(son->instanceSonPresse, ALLEGRO_PLAYMODE_LOOP);
+    al_set_sample_instance_playmode(son->instanceSonPresse, ALLEGRO_PLAYMODE_ONCE);
     al_set_sample_instance_gain(son->instanceSonPresse,0.5);
     al_attach_sample_instance_to_mixer(son->instanceSonPresse, son->mixer);
 

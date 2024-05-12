@@ -104,15 +104,15 @@ void ajouterIngredientListe(Ingredient *verre, Ingredient *ingredient);
 void libererListeIngredients(VerreListe *verre);
 void afficherIngredientsVerre(Ingredient *verre);
 void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
-void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map,bool pause);
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map,bool pause,Sons *son);
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map);
 RessourcesJeu *initRessourcesJeu();
 void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);
 void destroyJoueur(Joueur *joueur);
 void afficherTemps(RessourcesJeu *ressources);
-int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
-void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
-void mettreAJourTransformation(RessourcesJeu *ressources);
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son);
+void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map,Sons *son);
+void mettreAJourTransformation(RessourcesJeu *ressources,Sons *son);
 
 
 

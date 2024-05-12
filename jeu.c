@@ -4,6 +4,7 @@
 #include "sons.h"
 
 int ingredientSuivant = 1;
+int cuisson = 0;
 
 void chargerEtLireFichierTexte(const char *nomFichier, fichierTexteMap *map) {
     FILE *fichier = fopen(nomFichier, "r");
@@ -98,7 +99,7 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
     }
 }
 
-void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
+void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map,Sons *son) {
     int d = 0, i = 0;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
@@ -128,38 +129,42 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
         if (ingredient) {
             ALLEGRO_BITMAP *nouveauBitmap = NULL;
 
-            if (typeDeCase == 9) { // Station de découpe
+            if (typeDeCase == 9) {
                 if (ingredient->bitmap == ressources->mentheBrut && ingredient->compteurDecoupe < pressionsNecessaires) {
                     ingredient->compteurDecoupe++;
                     if (ingredient->compteurDecoupe >= pressionsNecessaires) {
                         nouveauBitmap = ressources->mentheDecoupe;
+                        jouerSonDecoupe(son);
                     }
                 } else if (ingredient->bitmap == ressources->citronBrut && ingredient->compteurDecoupe < pressionsNecessaires) {
                     ingredient->compteurDecoupe++;
                     if (ingredient->compteurDecoupe >= pressionsNecessaires) {
                         nouveauBitmap = ressources->citronDecoupe;
+                        jouerSonDecoupe(son);
                     }
                 }
-            } else if (typeDeCase == 5 && ingredient->bitmap == ressources->canneasucreBrut) { // Station de cuisson
+            } else if (typeDeCase == 5 && ingredient->bitmap == ressources->canneasucreBrut) {
                 if (ingredient->tempsTransformation == 0) {
-                    ingredient->tempsTransformation = al_get_time(); // Initialisation du temps de transformation
+                    cuisson = 1;
+                    ingredient->tempsTransformation = al_get_time();
+                    jouerSonCuisson(son);
                 }
                 if (al_get_time() - ingredient->tempsTransformation >= TEMPS_TRANSFORMATION_CUISSON) {
-                    nouveauBitmap = ressources->alcoolCuit; // Transformation finale après cuisson
+                    nouveauBitmap = ressources->alcoolCuit;
                 }
-            } else if (typeDeCase == 8 && ingredient->bitmap == ressources->citronDecoupe) { // Station de presse-agrumes
+            } else if (typeDeCase == 8 && ingredient->bitmap == ressources->citronDecoupe) {
                 if (ingredient->tempsTransformation == 0) {
-                    ingredient->tempsTransformation = al_get_time(); // Initialisation du temps de transformation
+                    jouerSonPresse(son);
                 }
                 if (al_get_time() - ingredient->tempsTransformation >= TEMPS_TRANSFORMATION_PRESSE) {
-                    nouveauBitmap = ressources->citronPresse; // Transformation finale après pressage
+                    nouveauBitmap = ressources->citronPresse;
                 }
             }
 
             if (nouveauBitmap) {
                 ingredient->bitmap = nouveauBitmap;
-                ingredient->compteurDecoupe = 0; // Réinitialisation du compteur
-                ingredient->tempsTransformation = 0; // Réinitialisation du temps de transformation
+                ingredient->compteurDecoupe = 0;
+                ingredient->tempsTransformation = 0;
                 if (nouveauBitmap == ressources->mentheDecoupe) {
                     ingredient->idIngredient = MENTHE_DECOUPE;
                 } else if (nouveauBitmap == ressources->citronDecoupe) {
@@ -169,7 +174,7 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
                 } else if (nouveauBitmap == ressources->citronPresse) {
                     ingredient->idIngredient = CITRON_PRESSE;
                 } else {
-                    ingredient->idIngredient = ingredient->idIngredient; // Aucun changement
+                    ingredient->idIngredient = ingredient->idIngredient;
                 }
             }
             return;
@@ -238,7 +243,7 @@ void dessinerJaugeDecoupe(Ingredient *ingredient, int pressionsNecessaires) {
     }
 }
 
-void mettreAJourTransformation(RessourcesJeu *ressources) {
+void mettreAJourTransformation(RessourcesJeu *ressources,Sons *son) {
     int i;
     double tempsActuel = al_get_time();
     for (i = 0; i < ressources->ItemLaches.compte; i++) {
@@ -258,7 +263,7 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
                     iconeTransformation = ressources->iconeDecoupe;
                 }
 
-                // Vérifier si le nombre de pressions est suffisant
+
                 if (ingredient->compteurDecoupe >= pressionsNecessaires) {
                     ingredient->bitmap = nouveauBitmap;
                     ingredient->compteurDecoupe = 0;
@@ -273,11 +278,11 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
                     dessinerJaugeDecoupe(ingredient, pressionsNecessaires);
                 }
 
-            } else if (ingredient->bitmap == ressources->canneasucreBrut) { // Cuisson de la canne à sucre
+            } else if (ingredient->bitmap == ressources->canneasucreBrut) {
                 tempsTransformation = TEMPS_TRANSFORMATION_CUISSON;
                 nouveauBitmap = ressources->alcoolCuit;
                 iconeTransformation = ressources->iconeCuisson;
-            } else if (ingredient->bitmap == ressources->citronDecoupe) { // Pressage de citron
+            } else if (ingredient->bitmap == ressources->citronDecoupe) {
                 tempsTransformation = TEMPS_TRANSFORMATION_PRESSE;
                 nouveauBitmap = ressources->citronPresse;
                 iconeTransformation = ressources->iconePresse;
@@ -289,6 +294,8 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
                     ingredient->tempsTransformation = 0;
                     if (nouveauBitmap == ressources->alcoolCuit) {
                         ingredient->idIngredient = ALCOOL_CUIT;
+                        arreterSonCuisson(son);
+                        cuisson = 0;
                     } else if (nouveauBitmap == ressources->citronPresse) {
                         ingredient->idIngredient = CITRON_PRESSE;
                     }
@@ -489,8 +496,8 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
     }
 }
 
-void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map, bool pause) {
-    if (pause) return;  // Ignorer les événements de clavier si en pause
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map, bool pause,Sons *son) {
+    if (pause) return;
 
     float vitesse = 1.0;
 
@@ -527,10 +534,10 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
                 agir(joueur2, resources, map);
                 break;
             case ALLEGRO_KEY_V: // Mise à jour ici
-                transformerIngredient(joueur1, resources, map);
+                transformerIngredient(joueur1, resources, map,son);
                 break;
             case ALLEGRO_KEY_M: // Mise à jour ici
-                transformerIngredient(joueur2, resources, map);
+                transformerIngredient(joueur2, resources, map,son);
                 break;
         }
     } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -738,7 +745,7 @@ void afficherTemps(RessourcesJeu *ressources) {
 }
 
 
-int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son) {
     struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
@@ -778,7 +785,9 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
             if (ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                 al_draw_bitmap(ressources->MenuPause, 0, 0, 0);
                 pause = 1;
-                tempsPauseDebut = al_get_time();  // Enregistrer le début de la pause
+                arreterMusiqueJeu(son);
+                arreterSonCuisson(son);
+                tempsPauseDebut = al_get_time();
                 al_flip_display();
             }
             if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER) {
@@ -790,6 +799,10 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
             if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
                 if (pause) {
                     pause = 0;
+                    jouerMusiqueJeu(son);
+                    if (cuisson == 1){
+                        jouerSonCuisson(son);
+                    }
                     double tempsPauseFin = al_get_time();
                     double pauseDuree = tempsPauseFin - tempsPauseDebut;
                     ressources->tempsAccumulePause += pauseDuree;
@@ -820,14 +833,14 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                     afficher_map(map, ressources);
                     dessinerToutMaillons(&liste, &imagesCommandes);
                     majPositionJoueur(joueur1, joueur2, &map);
-                    mettreAJourTransformation(ressources);
+                    mettreAJourTransformation(ressources,son);
                     afficherTemps(ressources);
                     al_flip_display();
                 }
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
-                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map, pause);
+                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map, pause,son);
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 enCours = false;
