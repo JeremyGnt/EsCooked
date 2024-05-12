@@ -99,17 +99,16 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
 }
 
 void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
-    int d = 0,i =0;
-    Sons son;
+    int d = 0, i = 0;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
-    double tempsActuel = al_get_time();
+    int pressionsNecessaires = 5; // Nombre de pressions nécessaires pour la découpe
 
     for (d = 0; d < 4; d++) {
         int adjX = mapX + directions[d][0];
         int adjY = mapY + directions[d][1];
-        if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue; // si en dehors, alors iteration suivante
+        if (adjX < 0 || adjX >= NB_COLONNES || adjY < 0 || adjY >= NB_LIGNES) continue; // Si en dehors, alors iteration suivante
 
         int typeDeCase = map->map[adjX][adjY];
         bool directionRegard = (directions[d][0] == (joueur->vx > 0 ? 1 : (joueur->vx < 0 ? -1 : 0))) &&
@@ -127,52 +126,50 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
         }
 
         if (ingredient) {
-            double tempsTransformation = 0;
             ALLEGRO_BITMAP *nouveauBitmap = NULL;
-            ALLEGRO_BITMAP *iconeTransformation = NULL;
 
-            if (typeDeCase == 9) {
-                if (ingredient->bitmap == ressources->mentheBrut) {
-                    nouveauBitmap = ressources->mentheDecoupe;
-                    tempsTransformation = TEMPS_TRANSFORMATION_MENTHE;
-                    iconeTransformation = ressources->iconeDecoupe;
-                } else if (ingredient->bitmap == ressources->citronBrut) {
-                    nouveauBitmap = ressources->citronDecoupe;
-                    tempsTransformation = TEMPS_TRANSFORMATION_CITRON;
-                    iconeTransformation = ressources->iconeDecoupe;
+            if (typeDeCase == 9) { // Station de découpe
+                if (ingredient->bitmap == ressources->mentheBrut && ingredient->compteurDecoupe < pressionsNecessaires) {
+                    ingredient->compteurDecoupe++;
+                    if (ingredient->compteurDecoupe >= pressionsNecessaires) {
+                        nouveauBitmap = ressources->mentheDecoupe;
+                    }
+                } else if (ingredient->bitmap == ressources->citronBrut && ingredient->compteurDecoupe < pressionsNecessaires) {
+                    ingredient->compteurDecoupe++;
+                    if (ingredient->compteurDecoupe >= pressionsNecessaires) {
+                        nouveauBitmap = ressources->citronDecoupe;
+                    }
                 }
-            } else if (typeDeCase == 5 && ingredient->bitmap == ressources->canneasucreBrut) {
-                nouveauBitmap = ressources->alcoolCuit;
-                tempsTransformation = TEMPS_TRANSFORMATION_CUISSON;
-                iconeTransformation = ressources->iconeCuisson;
-            } else if (typeDeCase == 8 && ingredient->bitmap == ressources->citronDecoupe) {
-                nouveauBitmap = ressources->citronPresse;
-                tempsTransformation = TEMPS_TRANSFORMATION_PRESSE;
-                iconeTransformation = ressources->iconePresse;
+            } else if (typeDeCase == 5 && ingredient->bitmap == ressources->canneasucreBrut) { // Station de cuisson
+                if (ingredient->tempsTransformation == 0) {
+                    ingredient->tempsTransformation = al_get_time(); // Initialisation du temps de transformation
+                }
+                if (al_get_time() - ingredient->tempsTransformation >= TEMPS_TRANSFORMATION_CUISSON) {
+                    nouveauBitmap = ressources->alcoolCuit; // Transformation finale après cuisson
+                }
+            } else if (typeDeCase == 8 && ingredient->bitmap == ressources->citronDecoupe) { // Station de presse-agrumes
+                if (ingredient->tempsTransformation == 0) {
+                    ingredient->tempsTransformation = al_get_time(); // Initialisation du temps de transformation
+                }
+                if (al_get_time() - ingredient->tempsTransformation >= TEMPS_TRANSFORMATION_PRESSE) {
+                    nouveauBitmap = ressources->citronPresse; // Transformation finale après pressage
+                }
             }
 
             if (nouveauBitmap) {
-                if (ingredient->tempsTransformation == 0) {
-                    ingredient->tempsTransformation = tempsActuel;
-                }
-                if (tempsActuel - ingredient->tempsTransformation >= tempsTransformation) {
-                    ingredient->bitmap = nouveauBitmap;
-                    ingredient->tempsTransformation = 0;
-                    if (nouveauBitmap == ressources->mentheDecoupe) {
-                        ingredient->idIngredient = MENTHE_DECOUPE;
-                    } else if (nouveauBitmap == ressources->citronDecoupe) {
-                        ingredient->idIngredient = CITRON_DECOUPE;
-                    } else if (nouveauBitmap == ressources->alcoolCuit) {
-                        ingredient->idIngredient = ALCOOL_CUIT;
-                    } else if (nouveauBitmap == ressources->citronPresse) {
-                        ingredient->idIngredient = CITRON_PRESSE;
-                    } else {
-                        ingredient->idIngredient = ingredient->idIngredient; // Aucun changement
-                    }
-
-                } else if (iconeTransformation) {
-                    al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
-                    dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
+                ingredient->bitmap = nouveauBitmap;
+                ingredient->compteurDecoupe = 0; // Réinitialisation du compteur
+                ingredient->tempsTransformation = 0; // Réinitialisation du temps de transformation
+                if (nouveauBitmap == ressources->mentheDecoupe) {
+                    ingredient->idIngredient = MENTHE_DECOUPE;
+                } else if (nouveauBitmap == ressources->citronDecoupe) {
+                    ingredient->idIngredient = CITRON_DECOUPE;
+                } else if (nouveauBitmap == ressources->alcoolCuit) {
+                    ingredient->idIngredient = ALCOOL_CUIT;
+                } else if (nouveauBitmap == ressources->citronPresse) {
+                    ingredient->idIngredient = CITRON_PRESSE;
+                } else {
+                    ingredient->idIngredient = ingredient->idIngredient; // Aucun changement
                 }
             }
             return;
@@ -218,50 +215,83 @@ void afficherIngredientsVerre(Ingredient *verre) {
     }
 }
 
+void dessinerJaugeDecoupe(Ingredient *ingredient, int pressionsNecessaires) {
+    if (ingredient->compteurDecoupe > 0) {
+        float proportion = (float)ingredient->compteurDecoupe / (float)pressionsNecessaires;
+        int jaugeLargeur = (int)(TAILLE_CARRE * proportion);
+        int jaugeHauteur = 5;
+
+        int posX = ingredient->x;
+        int posY = ingredient->y - 10;
+
+        ALLEGRO_COLOR couleurJauge;
+        if (proportion < 0.5) {
+            float vert = 1.0;
+            float rouge = proportion * 2.0;
+            couleurJauge = al_map_rgb_f(rouge, vert, 0.0);
+        } else {
+            float vert = 1.0 - ((proportion - 0.5) * 2.0);
+            couleurJauge = al_map_rgb_f(1.0, vert, 0.0);
+        }
+
+        al_draw_filled_rectangle(posX, posY, posX + jaugeLargeur, posY + jaugeHauteur, couleurJauge);
+    }
+}
+
 void mettreAJourTransformation(RessourcesJeu *ressources) {
     int i;
     double tempsActuel = al_get_time();
     for (i = 0; i < ressources->ItemLaches.compte; i++) {
         Ingredient *ingredient = ressources->ItemLaches.items[i];
-        if (ingredient && ingredient->tempsTransformation > 0) {
+        if (ingredient && (ingredient->tempsTransformation > 0 || ingredient->compteurDecoupe > 0)) {
             double tempsTransformation = 0;
             ALLEGRO_BITMAP *nouveauBitmap = NULL;
             ALLEGRO_BITMAP *iconeTransformation = NULL;
 
-            if (ingredient->bitmap == ressources->mentheBrut) {
-                tempsTransformation = TEMPS_TRANSFORMATION_MENTHE;
-                nouveauBitmap = ressources->mentheDecoupe;
-                iconeTransformation = ressources->iconeDecoupe;
-            } else if (ingredient->bitmap == ressources->citronBrut) {
-                tempsTransformation = TEMPS_TRANSFORMATION_CITRON;
-                nouveauBitmap = ressources->citronDecoupe;
-                iconeTransformation = ressources->iconeDecoupe;
-            } else if (ingredient->bitmap == ressources->canneasucreBrut) {
-                tempsTransformation = TEMPS_TRANSFORMATION_CUISSON;
-                nouveauBitmap = ressources->alcoolCuit;
-                iconeTransformation = ressources->iconeCuisson;
-            } else if (ingredient->bitmap == ressources->citronDecoupe) {
-                tempsTransformation = TEMPS_TRANSFORMATION_PRESSE;
-                nouveauBitmap = ressources->citronPresse;
-                iconeTransformation = ressources->iconePresse;
-            }
+            if (ingredient->bitmap == ressources->mentheBrut || ingredient->bitmap == ressources->citronBrut) { // Découpe
+                int pressionsNecessaires = 5;
+                if (ingredient->bitmap == ressources->mentheBrut) {
+                    nouveauBitmap = ressources->mentheDecoupe;
+                    iconeTransformation = ressources->iconeDecoupe;
+                } else if (ingredient->bitmap == ressources->citronBrut) {
+                    nouveauBitmap = ressources->citronDecoupe;
+                    iconeTransformation = ressources->iconeDecoupe;
+                }
 
-            if (nouveauBitmap) {
-                if (tempsActuel - ingredient->tempsTransformation >= tempsTransformation) {
+                // Vérifier si le nombre de pressions est suffisant
+                if (ingredient->compteurDecoupe >= pressionsNecessaires) {
                     ingredient->bitmap = nouveauBitmap;
+                    ingredient->compteurDecoupe = 0;
                     ingredient->tempsTransformation = 0;
                     if (nouveauBitmap == ressources->mentheDecoupe) {
                         ingredient->idIngredient = MENTHE_DECOUPE;
                     } else if (nouveauBitmap == ressources->citronDecoupe) {
                         ingredient->idIngredient = CITRON_DECOUPE;
-                    } else if (nouveauBitmap == ressources->alcoolCuit) {
+                    }
+                } else if (iconeTransformation) {
+                    al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
+                    dessinerJaugeDecoupe(ingredient, pressionsNecessaires);
+                }
+
+            } else if (ingredient->bitmap == ressources->canneasucreBrut) { // Cuisson de la canne à sucre
+                tempsTransformation = TEMPS_TRANSFORMATION_CUISSON;
+                nouveauBitmap = ressources->alcoolCuit;
+                iconeTransformation = ressources->iconeCuisson;
+            } else if (ingredient->bitmap == ressources->citronDecoupe) { // Pressage de citron
+                tempsTransformation = TEMPS_TRANSFORMATION_PRESSE;
+                nouveauBitmap = ressources->citronPresse;
+                iconeTransformation = ressources->iconePresse;
+            }
+
+            if (nouveauBitmap && (ingredient->bitmap != ressources->mentheBrut && ingredient->bitmap != ressources->citronBrut)) {
+                if (tempsActuel - ingredient->tempsTransformation >= tempsTransformation) {
+                    ingredient->bitmap = nouveauBitmap;
+                    ingredient->tempsTransformation = 0;
+                    if (nouveauBitmap == ressources->alcoolCuit) {
                         ingredient->idIngredient = ALCOOL_CUIT;
                     } else if (nouveauBitmap == ressources->citronPresse) {
                         ingredient->idIngredient = CITRON_PRESSE;
-                    } else {
-                        ingredient->idIngredient = ingredient->idIngredient; //ps changement
                     }
-
                 } else if (iconeTransformation) {
                     al_draw_bitmap(iconeTransformation, ingredient->x, ingredient->y, 0);
                     dessinerJaugeTransformation(ingredient, tempsActuel, tempsTransformation);
@@ -282,7 +312,7 @@ Ingredient *creer_ingredient(ALLEGRO_BITMAP *bitmap, int x, int y, int idIngredi
         ingredient->Tenir = false;
         ingredient->tempsTransformation = 0;
         ingredient->ingredientList = NULL;
-
+        ingredient->compteurDecoupe = 0; // Initialisation du compteur
     }
     return ingredient;
 }
@@ -414,6 +444,15 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
                 if (verre) {
                     ajouterIngredientListe(verre, joueur->ingredient);
                 } else {
+                    bool decoupable = (joueur->ingredient->idIngredient == MENTHE_BRUT || joueur->ingredient->idIngredient == CITRON_BRUT);
+                    bool cuissonPossible = (joueur->ingredient->idIngredient == CANNE_A_SUCRE_BRUT);
+                    bool pressePossible = (joueur->ingredient->idIngredient == CITRON_DECOUPE);
+
+                    if ((typeDeCase == 9 && !decoupable) || (typeDeCase == 5 && !cuissonPossible) || (typeDeCase == 8 && !pressePossible)) {
+                        // Ignorer les ingrédients non appropriés pour la station
+                        continue;
+                    }
+
                     joueur->ingredient->Tenir = false;
                     joueur->ingredient->x = adjX * TAILLE_CARRE + map->decalMapX;
                     joueur->ingredient->y = adjY * TAILLE_CARRE + map->decalMapY;
@@ -487,10 +526,10 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
             case ALLEGRO_KEY_L:
                 agir(joueur2, resources, map);
                 break;
-            case ALLEGRO_KEY_V:
+            case ALLEGRO_KEY_V: // Mise à jour ici
                 transformerIngredient(joueur1, resources, map);
                 break;
-            case ALLEGRO_KEY_M:
+            case ALLEGRO_KEY_M: // Mise à jour ici
                 transformerIngredient(joueur2, resources, map);
                 break;
         }
@@ -779,9 +818,9 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                         tempsprecedent = tempsactuel;
                     }
                     afficher_map(map, ressources);
-                    mettreAJourTransformation(ressources);
                     dessinerToutMaillons(&liste, &imagesCommandes);
                     majPositionJoueur(joueur1, joueur2, &map);
+                    mettreAJourTransformation(ressources);
                     afficherTemps(ressources);
                     al_flip_display();
                 }
@@ -797,7 +836,6 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
                 if (ev.type == ALLEGRO_EVENT_KEY_DOWN && ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE) {
                     enCours = false;
                 }
-
                 break;
         }
     }

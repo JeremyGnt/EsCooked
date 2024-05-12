@@ -22,10 +22,12 @@ struct VerreListe {
  struct Ingredient {
     int id;
     int idIngredient;
-    int x, y;
+    int x;
+    int y;
     ALLEGRO_BITMAP *bitmap;
     bool Tenir;
-    double tempsTransformation; // Temps de début de la transformation
+    double tempsTransformation;
+    int compteurDecoupe;
     VerreListe *ingredientList;
 } ;
 
