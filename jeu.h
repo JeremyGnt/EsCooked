@@ -108,7 +108,7 @@ RessourcesJeu *initRessourcesJeu();
 void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2);
 void destroyJoueur(Joueur *joueur);
 void afficherTemps(RessourcesJeu *ressources);
-int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources);
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son);
 void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map);
 
 

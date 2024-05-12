@@ -296,9 +296,10 @@ void ajouterItemLache(ItemLache *itemsLache, Ingredient *ingredient) {
 }
 
 void enleveItemLache(ItemLache *itemsLache, Ingredient *ingredient) {
-    for (int i = 0; i < itemsLache->compte; i++) {
+    int i,j;
+    for (i = 0; i < itemsLache->compte; i++) {
         if (itemsLache->items[i] == ingredient) {
-            for (int j = i; j < itemsLache->compte - 1; j++) {
+            for (j = i; j < itemsLache->compte - 1; j++) {
                 itemsLache->items[j] = itemsLache->items[j + 1];
             }
             itemsLache->items[--itemsLache->compte] = NULL;
@@ -526,8 +527,9 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
 
 void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
     Joueur *joueurs[2] = {joueur1, joueur2};
+    int i,indexJoueur;
 
-    for (int indexJoueur = 0; indexJoueur < 2; indexJoueur++) {
+    for (indexJoueur = 0; indexJoueur < 2; indexJoueur++) {
         Joueur *joueur = joueurs[indexJoueur];
         float nextX = joueur->x + joueur->vx;
         float nextY = joueur->y + joueur->vy;
@@ -561,7 +563,7 @@ void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
         }
     }
 
-    for (int i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         Joueur *joueur = joueurs[i];
         if (joueur->bitmap != NULL) {
             al_draw_rotated_bitmap(joueur->bitmap, al_get_bitmap_width(joueur->bitmap) / 2,
@@ -633,6 +635,7 @@ RessourcesJeu *initRessourcesJeu() {
 }
 
 void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *joueur2) {
+    int i;
     if (ressources) {
         al_destroy_bitmap(ressources->sol1);
         al_destroy_bitmap(ressources->sol2);
@@ -649,7 +652,7 @@ void detruireRessourcesJeu(RessourcesJeu *ressources, Joueur *joueur1, Joueur *j
         al_destroy_bitmap(ressources->poubelle);
         al_destroy_bitmap(ressources->presseAgrume);
 
-        for (int i = 0; i < ressources->ItemLaches.compte; i++) {
+        for (i = 0; i < ressources->ItemLaches.compte; i++) {
             free(ressources->ItemLaches.items[i]);
         }
 
@@ -699,7 +702,7 @@ void afficherTemps(RessourcesJeu *ressources) {
 }
 
 
-int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son) {
     struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
@@ -732,6 +735,8 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources) {
 
         if (tempsRestant <= 0) {
             enCours = false;
+            arreterMusiqueJeu(son);
+            jouerSonFin(son);
             continue;
         }
 
