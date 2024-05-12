@@ -98,9 +98,8 @@ void dessinerJaugeTransformation(Ingredient *ingredient, double tempsActuel, dou
     }
 }
 
-void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
+void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map,Sons *son) {
     int d = 0,i =0;
-    Sons son;
     static const int directions[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
     int mapX = (joueur->x - map->decalMapX) / TAILLE_CARRE;
     int mapY = (joueur->y - map->decalMapY) / TAILLE_CARRE;
@@ -135,19 +134,23 @@ void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTex
                 if (ingredient->bitmap == ressources->mentheBrut) {
                     nouveauBitmap = ressources->mentheDecoupe;
                     tempsTransformation = TEMPS_TRANSFORMATION_MENTHE;
+                    jouerSonDecoupe(son);
                     iconeTransformation = ressources->iconeDecoupe;
                 } else if (ingredient->bitmap == ressources->citronBrut) {
                     nouveauBitmap = ressources->citronDecoupe;
                     tempsTransformation = TEMPS_TRANSFORMATION_CITRON;
+                    jouerSonDecoupe(son);
                     iconeTransformation = ressources->iconeDecoupe;
                 }
             } else if (typeDeCase == 5 && ingredient->bitmap == ressources->canneasucreBrut) {
                 nouveauBitmap = ressources->alcoolCuit;
                 tempsTransformation = TEMPS_TRANSFORMATION_CUISSON;
+                jouerSonCuisson(son);
                 iconeTransformation = ressources->iconeCuisson;
             } else if (typeDeCase == 8 && ingredient->bitmap == ressources->citronDecoupe) {
                 nouveauBitmap = ressources->citronPresse;
                 tempsTransformation = TEMPS_TRANSFORMATION_PRESSE;
+                jouerSonPresse(son);
                 iconeTransformation = ressources->iconePresse;
             }
 
@@ -218,7 +221,7 @@ void afficherIngredientsVerre(Ingredient *verre) {
     }
 }
 
-void mettreAJourTransformation(RessourcesJeu *ressources) {
+void mettreAJourTransformation(RessourcesJeu *ressources,Sons *son) {
     int i;
     double tempsActuel = al_get_time();
     for (i = 0; i < ressources->ItemLaches.compte; i++) {
@@ -252,12 +255,16 @@ void mettreAJourTransformation(RessourcesJeu *ressources) {
                     ingredient->tempsTransformation = 0;
                     if (nouveauBitmap == ressources->mentheDecoupe) {
                         ingredient->idIngredient = MENTHE_DECOUPE;
+                        arreterSonDecoupe(son);
                     } else if (nouveauBitmap == ressources->citronDecoupe) {
                         ingredient->idIngredient = CITRON_DECOUPE;
+                        arreterSonDecoupe(son);
                     } else if (nouveauBitmap == ressources->alcoolCuit) {
                         ingredient->idIngredient = ALCOOL_CUIT;
+                        arreterSonCuisson(son);
                     } else if (nouveauBitmap == ressources->citronPresse) {
                         ingredient->idIngredient = CITRON_PRESSE;
+                        arreterSonPresse(son);
                     } else {
                         ingredient->idIngredient = ingredient->idIngredient; //ps changement
                     }
@@ -451,7 +458,7 @@ void agir(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map) {
     }
 }
 
-void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map, bool pause) {
+void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur2, RessourcesJeu *resources, fichierTexteMap *map, bool pause, Sons *son) {
     if (pause) return;  // Ignorer les événements de clavier si en pause
 
     float vitesse = 1.0;
@@ -489,10 +496,10 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
                 agir(joueur2, resources, map);
                 break;
             case ALLEGRO_KEY_V:
-                transformerIngredient(joueur1, resources, map);
+                transformerIngredient(joueur1, resources, map, son);
                 break;
             case ALLEGRO_KEY_M:
-                transformerIngredient(joueur2, resources, map);
+                transformerIngredient(joueur2, resources, map, son);
                 break;
         }
     } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
@@ -745,6 +752,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son) 
                 al_draw_bitmap(ressources->MenuPause, 0, 0, 0);
                 pause = 1;
                 tempsPauseDebut = al_get_time();  // Enregistrer le début de la pause
+                arreterMusiqueJeu(son);
                 al_flip_display();
             }
             if (ev.keyboard.keycode == ALLEGRO_KEY_ENTER) {
@@ -756,6 +764,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son) 
             if (ev.keyboard.keycode == ALLEGRO_KEY_SPACE) {
                 if (pause) {
                     pause = 0;
+                    jouerMusiqueJeu(son);
                     double tempsPauseFin = al_get_time();
                     double pauseDuree = tempsPauseFin - tempsPauseDebut;
                     ressources->tempsAccumulePause += pauseDuree;
@@ -784,7 +793,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son) 
                         tempsprecedent = tempsactuel;
                     }
                     afficher_map(map, ressources);
-                    mettreAJourTransformation(ressources);
+                    mettreAJourTransformation(ressources,son);
                     dessinerToutMaillons(&liste, &imagesCommandes);
                     majPositionJoueur(joueur1, joueur2, &map);
                     afficherTemps(ressources);
@@ -793,7 +802,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources, Sons *son) 
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
             case ALLEGRO_EVENT_KEY_UP:
-                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map, pause);
+                gererEvenementsClavier(ev, joueur1, joueur2, ressources, &map, pause,son);
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 enCours = false;
