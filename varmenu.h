@@ -23,8 +23,10 @@ sub createSub(float x, float y, int type){
     *  CREATION DU MENU  *
     **********************/
 
-enum{ EXIT, NEWGAME,GUIDE, OPTIONS};
-enum{ MENUPRINCIPAL, NEW, GUIDEMENU, OPT, QUIT, JEU, OFF};
+enum{ EXIT, NEWGAME, GUIDE, OPTIONS};
+enum {
+    MENUPRINCIPAL, NEW, GUIDEMENU, OPT, QUIT, JEU, OFF, PSEUDO1, PSEUDO2
+};
 
 int pos = 0;
 

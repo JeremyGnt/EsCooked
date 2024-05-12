@@ -570,7 +570,7 @@ void gererEvenementsClavier(ALLEGRO_EVENT event, Joueur *joueur1, Joueur *joueur
     }
 }
 
-void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
+void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map, char* pseudo1, char* pseudo2, ALLEGRO_FONT *mfont) {
     Joueur *joueurs[2] = {joueur1, joueur2};
 
     for (int indexJoueur = 0; indexJoueur < 2; indexJoueur++) {
@@ -618,6 +618,9 @@ void majPositionJoueur(Joueur *joueur1, Joueur *joueur2, fichierTexteMap *map) {
             al_draw_bitmap(joueur->ingredient->bitmap, joueur->ingredient->x, joueur->ingredient->y, 0);
         }
     }
+    al_draw_text(mfont, BLANC, joueur1->x, joueur1->y - 50, 0,  pseudo1);
+    al_draw_text(mfont, BLANC, joueur2->x, joueur2->y - 50, 0,  pseudo2);
+
 }
 
 RessourcesJeu *initRessourcesJeu() {
@@ -745,7 +748,7 @@ void afficherTemps(RessourcesJeu *ressources) {
 }
 
 
-int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son) {
+int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son, char* pseudo1, char* pseudo2, ALLEGRO_FONT *mfont){
     struct Recette mojito = {MOJITO, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette caipirinha = {CAIPIRINHA, {LIMONADE, CITRON_PRESSE, ALCOOL_CUIT, INGREDIENT_NULL}};
     struct Recette hintzy = {HINTZY, {LIMONADE, CITRON_PRESSE, MENTHE_DECOUPE, INGREDIENT_NULL}};
@@ -832,7 +835,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son) {
                     }
                     afficher_map(map, ressources);
                     dessinerToutMaillons(&liste, &imagesCommandes);
-                    majPositionJoueur(joueur1, joueur2, &map);
+                    majPositionJoueur( joueur1,  joueur2, &map,  pseudo1,  pseudo2, mfont);
                     mettreAJourTransformation(ressources,son);
                     afficherTemps(ressources);
                     al_flip_display();

@@ -89,7 +89,7 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* fleche, AL
                 case MENUPRINCIPAL:{
                     switch(pos){
                         case 0:{
-                            state = NEW;
+                            state = PSEUDO1;
                             afficherImage(fond, 0, 0, 0);
                             afficherImage(pseudo, 0, 0, 0);
                             arreterMusiqueMenu(son);
@@ -130,10 +130,6 @@ int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* fleche, AL
                             break;
                         }
                     }
-                    break;
-                }
-                case NEW : {
-                    state = JEU;
                     break;
                 }
                 case OPT : {
