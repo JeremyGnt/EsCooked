@@ -5,6 +5,12 @@
 #include "sons.h"
 
 typedef struct {
+    int scoreJoueur1;
+    int scoreJoueur2;
+    int commandesRendues;
+} Score;
+
+typedef struct {
     int map[NB_COLONNES][NB_LIGNES];
     ALLEGRO_BITMAP *mapImages[NB_COLONNES][NB_LIGNES];
     int decalMapX, decalMapY;
@@ -113,7 +119,8 @@ void afficherTemps(RessourcesJeu *ressources);
 int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son);
 void transformerIngredient(Joueur *joueur, RessourcesJeu *ressources, fichierTexteMap *map,Sons *son);
 void mettreAJourTransformation(RessourcesJeu *ressources,Sons *son);
-
+void initialiser_scores(Score score);
+void afficher_scores(RessourcesJeu *ressources, Score score);
 
 
 
