@@ -12,9 +12,9 @@
 
 
 int menuf(ALLEGRO_EVENT* event, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* perso1, ALLEGRO_BITMAP* perso2,
-          ALLEGRO_BITMAP* boxes, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm, int state,Sons *son);
+          ALLEGRO_BITMAP* boxes, ALLEGRO_BITMAP* pseudo, ALLEGRO_BITMAP* confirm, ALLEGRO_BITMAP* guide, ALLEGRO_BITMAP* sonOn, ALLEGRO_BITMAP* sonOff, ALLEGRO_BITMAP* options, int state, int* mute,Sons *son);
 
-void declarationMenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* menu);
+void declarationMenu();
 
 void transitionmenu(ALLEGRO_BITMAP* fleche, ALLEGRO_BITMAP* fond, ALLEGRO_BITMAP* perso, ALLEGRO_BITMAP* boxes);
 

@@ -84,11 +84,7 @@ int main() {
     //BITMAPS
     ALLEGRO_BITMAP *mrbeast = NULL;
     ALLEGRO_BITMAP *transparent = NULL;
-    ALLEGRO_BITMAP *menu = NULL;
-    ALLEGRO_BITMAP *fleche = NULL;
     ALLEGRO_BITMAP *R = NULL;
-    ALLEGRO_BITMAP *pseudo = NULL;
-    ALLEGRO_BITMAP *confirm = NULL;
 
     ALLEGRO_BITMAP *Fleche = NULL;
     ALLEGRO_BITMAP *boxesM = NULL;
@@ -97,6 +93,11 @@ int main() {
     ALLEGRO_BITMAP *perso2 = NULL;
     ALLEGRO_BITMAP *pseudoM = NULL;
     ALLEGRO_BITMAP *confirM = NULL;
+    ALLEGRO_BITMAP *guide = NULL;
+    ALLEGRO_BITMAP *options = NULL;
+    ALLEGRO_BITMAP *sonOn = NULL;
+    ALLEGRO_BITMAP *sonOff = NULL;
+
 
     //icone
     ALLEGRO_BITMAP *icone = NULL;
@@ -118,16 +119,8 @@ int main() {
     assert(mrbeast != NULL);
     transparent = al_load_bitmap("..\\PNGS\\temp\\default.png");
     assert(transparent != NULL);
-    menu = al_load_bitmap("..\\PNGS\\temp\\menu.png");
-    assert(menu != NULL);
-    fleche = al_load_bitmap("..\\PNGS\\temp\\fleche.png");
-    assert(fleche != NULL);
     R = al_load_bitmap("..\\PNGS\\temp\\hardR.png");
     assert(R != NULL);
-    pseudo = al_load_bitmap("..\\PNGS\\temp\\pseudomenu.png");
-    assert(pseudo != NULL);
-    confirm = al_load_bitmap("..\\PNGS\\temp\\confirmation.png");
-    assert(confirm != NULL);
 
     Fleche = al_load_bitmap("..\\PNGS\\ImagesMenu\\fleche.png");
     assert(Fleche != NULL);
@@ -143,13 +136,21 @@ int main() {
     assert(pseudoM != NULL);
     confirM = al_load_bitmap("..\\PNGS\\ImagesMenu\\QuitterConfirmation.png");
     assert(confirM != NULL);
+    guide = al_load_bitmap("..\\PNGS\\ImagesMenu\\MenuGuide.png");
+    assert(guide != NULL);
+    options = al_load_bitmap("..\\PNGS\\ImagesMenu\\Options.png");
+    assert(options != NULL);
+    sonOn = al_load_bitmap("..\\PNGS\\ImagesMenu\\SonActivé.png");
+    assert(sonOn != NULL);
+    sonOff = al_load_bitmap("..\\PNGS\\ImagesMenu\\SonDésactivé.png");
+    assert(sonOff != NULL);
 
 
     //init
     const char *charac = "a\0b\0c\0d\0e\0f\0g\0h\0i\0j\0k\0l\0m\0n\0o\0p\0q\0r\0s\0t\0u\0v\0w\0x\0y\0z\0";
     int window_width = al_get_display_width(ressources->display);
     int window_height = al_get_display_height(ressources->display);
-    int retour = 0;
+    int retour = 0, mute = 0;
 
 
     enum {
@@ -157,7 +158,7 @@ int main() {
     };
     int state = MENUPRINCIPAL;
 
-    declarationMenu(fleche, menu);
+    declarationMenu();
     transitionmenu(Fleche, fond, perso1, boxesM);
 
     Joueur joueur1 = {
@@ -182,8 +183,14 @@ int main() {
         al_wait_for_event(ressources->event_queue, &event);
         if (state == MENUPRINCIPAL && retour == 1) {
             transitionmenu(Fleche, fond, perso1, boxesM);
-            jouerMusiqueMenu(&son);
+            if(mute == 0){
+                jouerMusiqueMenu(&son);
+            }
             retour = 0;
+        }
+        if(mute == 1){
+            arreterMusiqueJeu(&son);
+            arreterMusiqueMenu(&son);
         }
         switch (event.type) {
             case ALLEGRO_EVENT_DISPLAY_CLOSE: {
@@ -193,7 +200,7 @@ int main() {
 
             case ALLEGRO_EVENT_KEY_DOWN: {
                 if (state == QUIT || state == OPT || state == GUIDE || state == NEW || state == MENUPRINCIPAL) {
-                    state = menuf(&event, fond, Fleche, perso1, perso2, boxesM, pseudoM, confirM, state, &son);
+                    state = menuf(&event, fond, Fleche, perso1, perso2, boxesM, pseudoM, confirM, guide, sonOn, sonOff, options, state, &mute, &son);
                 }
                 if (state == JEU) {
                     // Réinitialiser le jeu avant de commencer une nouvelle partie
@@ -219,12 +226,19 @@ int main() {
 
     // Libérations
     detruireRessourcesJeu(ressources, &joueur1, &joueur2);
-    destroy(mrbeast);
     destroy(icone);
     destroy(transparent);
-    destroy(menu);
-    destroy(R);
-    destroy(pseudo);
-    destroy(confirm);
+    destroy(Fleche);
+    destroy(perso1);
+    destroy(perso2);
+    destroy(mrbeast);
+    destroy(boxesM);
+    destroy(fond);
+    destroy(pseudoM);
+    destroy(confirM);
+    destroy(guide);
+    destroy(options);
+    destroy(sonOn);
+    destroy(sonOff);
     return 0;
 }
