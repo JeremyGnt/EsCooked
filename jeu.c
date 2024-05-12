@@ -781,6 +781,7 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son, c
 
         if (tempsRestant <= 0) {
             enCours = false;
+            jouerSonFin(son);
             continue;
         }
 
@@ -859,3 +860,24 @@ int jeu(Joueur *joueur1, Joueur *joueur2, RessourcesJeu *ressources,Sons *son, c
     return state;
 }
 
+void initialiser_scores(Score score) {
+    score.scoreJoueur1 = 0;
+    score.scoreJoueur2 = 0;
+    score.commandesRendues = 0;
+}
+
+
+void afficher_scores(RessourcesJeu *ressources, Score score) {
+    char text[100];
+
+    sprintf(text, "Joueur 1: %d", score.scoreJoueur1);
+    al_draw_text(ressources->font, NOIR, 10, 10, 0, text);
+
+    sprintf(text, "Joueur 2: %d", score.scoreJoueur2);
+    al_draw_text(ressources->font, NOIR, 10, 30, 0, text);
+
+    sprintf(text, "Commandes Rendues: %d", score.commandesRendues);
+    al_draw_text(ressources->font, NOIR, 10, 50, 0, text);
+
+    al_flip_display(); // Met à jour l'affichage
+}
