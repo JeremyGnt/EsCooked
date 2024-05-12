@@ -199,7 +199,7 @@ int main() {
                     // Réinitialiser le jeu avant de commencer une nouvelle partie
                     reinitialiserRessourcesJeu(ressources);
                     initialiserJoueurs(&joueur1, &joueur2);
-                    state = jeu(&joueur1, &joueur2, ressources,&son);
+                    state = jeu(&joueur1, &joueur2, ressources);
                     arreterMusiqueJeu(&son);
                     retour = 1;
                 }
