@@ -97,7 +97,7 @@ Mon implication a porté sur le développement, l’intégration technique et la
 Ce projet met en avant :
 
 - la capacité à développer en **C** sur un projet réel,
-- la aptitude à travailler dans un **cadre collectif**,
+- l'aptitude à travailler dans un **cadre collectif**,
 - la rigueur sur les aspects **build, structure et maintenabilité**,
 - la capacité à livrer un résultat exploitable dans un contexte académique exigeant.
 
